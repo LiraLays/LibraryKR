@@ -1,0 +1,248 @@
+:root {
+  --primary: #4f46e5;
+  --primary-dark: #4338ca;
+  --bg: #f9fafb;
+  --text: #111827;
+  --border: #e5e7eb;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-size: 14px;
+}
+
+*, *:before, *:after { box-sizing: border-box; }
+
+body {
+  padding: 0;
+  margin: 0;
+  background-color: var(--bg);
+  color: var(--text);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+
+.hidden { display: none !important; }
+
+.card {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  width: 100%;
+  max-width: 320px;
+}
+
+.card.wide { max-width: 600px; }
+
+h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.form-group { margin-bottom: 1rem; }
+
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+input:focus { border-color: var(--primary); }
+
+.primary-btn {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-top: 0.5rem;
+}
+
+.primary-btn:hover { background-color: var(--primary-dark); }
+
+/* Стили таблицы */
+.toolbar { display: flex; gap: 10px; margin-bottom: 20px; }
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+}
+
+.data-table th, .data-table td {
+  text-align: left;
+  padding: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.status-ok {
+  color: #059669;
+  background: #ecfdf5;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  color: #6b7280;
+  cursor: pointer;
+  text-decoration: underline;
+  width: 100%;
+}
+
+.dashboard {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  background: #f3f4f6;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 260px;
+  background: #1e293b;
+  color: white;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-header {
+  padding: 20px;
+  background: #0f172a;
+  text-align: center;
+}
+
+.table-list {
+  flex: 1;
+  overflow-y: auto; /* Если таблиц много, появится скролл */
+  padding: 10px;
+}
+
+.nav-item {
+  width: 100%;
+  padding: 12px 15px;
+  background: transparent;
+  border: none;
+  color: #cbd5e1;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: 0.2s;
+  margin-bottom: 5px;
+}
+
+.nav-item:hover, .nav-item.active {
+  background: #334155;
+  color: white;
+}
+
+/* Main Content */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 30px;
+}
+
+.content-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.table-container {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+/* Стили модального окна */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-card {
+  background: white;
+  width: 90%;
+  max-width: 450px;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #6b7280;
+}
+
+#modal-fields label {
+  font-weight: 600;
+  margin-top: 12px;
+  margin-bottom: 4px;
+  color: #374151;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.secondary-btn {
+  flex: 1;
+  padding: 10px;
+  background: #f3f4f6;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* Стили кнопок внутри таблицы */
+.btn-edit { color: #4f46e5; border: none; background: none; cursor: pointer; }
+.btn-delete { color: #ef4444; border: none; background: none; cursor: pointer; margin-left: 10px; }

@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>View</title>
+  </head>
+  <body>
+    <div id="auth-section" class="container">
+      <div class="card">
+        <h1>Авторизация</h1>
+        <div class="form-group">
+          <label for="username">Логин:</label>
+          <input type="text" id="username" placeholder="Введите логин" />
+        </div>
+        <div class="form-group">
+          <label for="password">Пароль:</label>
+          <input type="password" id="password" placeholder="Введите пароль" />
+        </div>
+        <button id="login-btn" class="primary-btn">Войти</button>
+      </div>
+    </div>
+
+    <div id="app-section" class="dashboard hidden">
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <h3>📚 Библиотека</h3>
+        </div>
+        <nav class="table-list" id="table-navigation">
+          <button class="nav-item active" data-table="books">Книги</button>
+          <button class="nav-item" data-table="authors">Авторы</button>
+          <button class="nav-item" data-table="readers">Читатели</button>
+          <button class="nav-item" data-table="loans">Выдача книг</button>
+        </nav>
+      </aside>
+
+      <main class="main-content">
+        <header class="content-header">
+          <h2 id="current-table-name">Таблица: Книги</h2>
+          <div class="actions">
+            <button id="add-record-btn" class="primary-btn">Добавить запись</button>
+          </div>
+        </header>
+
+        <section class="table-container">
+          <table id="dynamic-table">
+            <thead>
+              <tr id="table-head">
+                </tr>
+            </thead>
+            <tbody id="table-body">
+              </tbody>
+          </table>
+        </section>
+      </main>
+    </div>
+    <div id="modal-overlay" class="modal-overlay hidden">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h2 id="modal-title">Редактировать запись</h2>
+          <button id="close-modal" class="close-btn">&times;</button>
+        </div>
+        <form id="modal-form">
+          <div id="modal-fields">
+          </div>
+          <div class="modal-actions">
+            <button type="button" id="cancel-btn" class="secondary-btn">Отменан</button>
+            <button type="submit" class="primary-btn">Сохранить</button>
+          </div>
+        </form>
+      </div> 
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
+    <!-- <h1>Hello!</h1>
+    <label for="text-field">String to Send to the C++ Process:</label>
+    <input type="text" name="text-field" id="text-field" />
+    <button id="send-btn">Send</button>
+    <script type="module" src="/src/main.js"></script> -->
+
