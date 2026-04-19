@@ -1,28 +1,31 @@
-import { getBooks, getBook, addBook, deleteBook, getAuthors } from '../api.js';
+import {addBook, deleteBook, getAuthors, getBook, getBooks} from '../api.js';
 
 // Page status
-let allBooks = [];    // All books loaded from server 
+let allBooks = [];    // All books loaded from server
 let allAuthors = [];  // All authors for drop-down list
 let editingId = null; // Id edited book (null = add)
 
 // Entry point
 export async function initBooksPage() {
-    renderPage();        // First render
-    await loadBooks();   // Then load data
+    document.getElementById('current-table-name').textContent = 'Книги';
+
+    renderTableHead(); // Rendering table head
+
+    bindEvents();
+
+    // Then load data
     await loadAuthors();
+    await loadBooks();
 }
 
 // Loading data
 async function loadBooks() {
-    showLoading(true);
     const response = await getBooks();
-    showLoading(false);
-
-    if (response.status === "ok") {
+    if (response.status === 'ok') {
         allBooks = response.data;
-        renderTable(allBooks);
+        renderTableBody(allBooks);
     } else {
-        showError("Can't load books: " + response.message);
+        showError('Can\'t load books: ' + response.message);
     }
 }
 
@@ -31,92 +34,51 @@ async function loadAuthors() {
     const response = await getAuthors();
     if (response.status === 'ok') {
         allAuthors = response.data;
-        // Filling drop-down list with authors
-        const select = document.getElementById('book-author-select');
-        if (select) {
-            select.innerHTML = allAuthors.map(a =>
-                `<option value="${a.id}">${a.name}</option>`
-            ).join('');
-        }
     }
 }
 
 // Render
 
 // Drawing all page - table and form
-function renderPage() {
-    const app = document.getElementById('app');
-    app.innerHTML = `
-        <div class="books-page">
-            <!-- Header + "add" button -->
-            <div class="page-header">
-                <h1>Books</h1>
-                <button id="btn-add-book" class="btn btn-primary">
-                    + Add book
+function renderTableHead() {
+    const tbody = document.getElementById('table-body');
+
+    if (books.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="5" style="text-align:center; color:#999; padding:32px;">
+                    Книги не найдены
+                </td>
+            </tr>`;
+        return;
+    }
+
+    tbody.innerHTML = books
+                          .map(book => `
+        <tr>
+            <td>${book.id}</td>
+            <td>${book.name}</td>
+            <td>${book.author}</td>
+            <td>${book.year}</td>
+            <td>
+                <button class="btn-edit">
+                        onclick="window.editBook('${book.id}')">
+                        Change
                 </button>
-            </div>
-
-            <!-- Search -->
-            <input type="text" id="book-search"
-                placeholder="Search by name or author..."
-                class="search-input" />
-            
-            <!-- Loading indicator -->
-            <div id="loading" style="display:none">Loading...</div>
-
-            <!-- Error message -->
-            <div id="error-msg" class="error" style="display:none"></div>
-
-            <!-- Books table -->
-            <table class="books-table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Author</th>
-                        <th>Year</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="books-tbody">
-                    <!-- String adding dynamicly -->
-                </tbody>
-            </table>
-
-            <div id="modal-overlay" class="modal-overlay" style="display:none">
-                <div class="modal">
-                    <h2 id="modal-title">Add book</h2>
-
-                    <label>Name</label>
-                    <input type="text" id="book-name" placeholder="Book name" />
-                    
-                    <label>Author</label>
-                    <select id="book-author-select">
-                        <option value="">Loading...</option>
-                    </select>
-
-                    <label>Publication year</label>
-                    <input type="number" id="book-year" 
-                           placeholder="Year" min="1000" max="2100" />
-
-                    <div class="modal-buttons">
-                        <button id="btn-save" class="btn btn-primary">Save</button>
-                        <button id="btn-cancel" class="btn btn-secondary">Back</button>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    `;
-
-    // Event processors
-    bindEvents();
+                <button class="btn-delete"
+                        onclick="window.deleteBookById('${book.id}')">
+                        Delete
+                </button>
+            </td>
+        <tr>
+    `).join('');
 }
 
 // Filling tbody with book strings
 function renderTable(books) {
     const tbody = document.getElementById('books-tbody');
-    if (!tbody) return;
+    if (!tbody)
+        return;
 
     if (books.length === 0) {
         tbody.innerHTML = `
@@ -126,7 +88,8 @@ function renderTable(books) {
         return;
     }
 
-    tbody.innerHTML = books.map(book => `
+    tbody.innerHTML = books
+                          .map(book => `
         <tr data-id="${book.id}">
             <td>${book.id}</td>
             <td>${book.name}</td>
@@ -162,16 +125,16 @@ function bindEvents() {
 
     // Click on overlay closing modal
     document.getElementById('modal-overlay').addEventListener('click', (e) => {
-        if (e.target.id === 'modal-overlay') closeModal();
+        if (e.target.id === 'modal-overlay')
+            closeModal();
     });
 
     // Search - filter the table locally without request to server
     document.getElementById('book-search').addEventListener('input', (e) => {
         const query = e.target.value.toLowerCase();
-        const filtered = allBooks.filter(book =>
-            book.name.toLowerCase().includes(query) ||
-            book.author.toLowerCase().includes(query)
-        );
+        const filtered =
+            allBooks.filter(book => book.name.toLowerCase().includes(query) ||
+                                    book.author.toLowerCase().includes(query));
         renderTable(filtered);
     });
 }
@@ -187,7 +150,8 @@ function openModal(book = null) {
         title.textContent = 'Edit book';
         document.getElementById('book-name').value = book.name;
         document.getElementById('book-year').value = book.year;
-        document.getElementById('book-author-select').value = book.authorId || '';
+        document.getElementById('book-author-select').value =
+            book.authorId || '';
     } else {
         // Adding mode
         title.textContent = 'Add book';
@@ -219,8 +183,9 @@ async function saveBook() {
 
     let response;
     if (editingId) {
-        // Editing 
-        response = await sendCommand(`UPDATE_BOOK|${editingId}|${name}|${authorId}|${year}`);
+        // Editing
+        response = await sendCommand(
+            `UPDATE_BOOK|${editingId}|${name}|${authorId}|${year}`);
     } else {
         // Adding new book
         response = await addBook(name, authorId, year);
@@ -235,22 +200,25 @@ async function saveBook() {
 }
 
 // Open edit form for particular book
-window.editBook = async function (id) {
+window.editBook =
+    async function(id) {
     editingId = id;
     const response = await getBook(id);
 
     if (response.status === 'ok' && response.data.length > 0) {
         openModal(response.data[0]);
     } else {
-        alert("Can't load book data");
+        alert('Can\'t load book data');
     }
 }
 
-// Delete book with submit
-window.deleteBookById = async function (id) {
+    // Delete book with submit
+    window.deleteBookById =
+        async function(id) {
     const book = allBooks.find(b => b.id === id);
     const name = book ? book.name : `#${id}`;
-    if (!confirm(`Delete book "${name}"?`)) return;
+    if (!confirm(`Delete book "${name}"?`))
+        return;
 
     const response = await deleteBook(id);
     if (response.status === 'ok') {
@@ -263,7 +231,8 @@ window.deleteBookById = async function (id) {
 // Additional
 
 function showLoading(visible) {
-    document.getElementById('loading').style.display = visible ? 'block' : 'none';
+    document.getElementById('loading').style.display =
+        visible ? 'block' : 'none';
 }
 
 function showError(msg) {
