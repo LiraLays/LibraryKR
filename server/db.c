@@ -124,17 +124,20 @@ void db_delete_book(PGconn *conn, const char *id, char *out, int out_size) {
 // Таблица Employee с полями Login, Password
 void db_login(PGconn *conn, const char *login, const char *password, char *out, int out_size) {
     const char *params[2] = { login, password };
-    PGresult *res = PQexecParams(conn, 
-    "SELECT IdEmployee, FullName FROM Employee "
-    "WHERE Login = $1 AND Password = $2",
-    2, NULL, params, NULL, NULL, 0);
+    PGresult *res = PQexecParams(conn,
+        "SELECT e.idemployee, e.fullname "
+        "FROM account a "
+        "JOIN employee e ON a.idemployee = e.idemployee "
+        "WHERE a.login = $1 AND a.password = $2",
+        2, NULL, params, NULL, NULL, 0);
 
     if (PQresultStatus(res) != PGRES_TUPLES_OK || PQntuples(res) == 0) {
         snprintf(out, out_size, "ERROR|Invalid login or password");
+        PQclear(res);
     } else {
         snprintf(out, out_size, "OK|%s|%s",
-            PQgetvalue(res, 0, 0), //IdEmployee
-            PQgetvalue(res, 0, 1) //FullName
+            PQgetvalue(res, 0, 0),  // idemployee
+            PQgetvalue(res, 0, 1)   // fullname
         );
         PQclear(res);
     }
@@ -143,7 +146,7 @@ void db_login(PGconn *conn, const char *login, const char *password, char *out, 
 // Get authors
 void db_get_authors(PGconn *conn, char *out, int out_size) {
     PGresult *res = PQexec(conn,
-        "SELECT IdAuthor, FullName FROM Author, ORDER BY FullName");
+        "SELECT IdAuthor, FullName FROM Author ORDER BY FullName");
     
     if (PQresultStatus(res) != PGRES_TUPLES_OK) {
         snprintf(out, out_size, "ERROR|%s", PQerrorMessage(conn));
@@ -160,7 +163,7 @@ void db_get_authors(PGconn *conn, char *out, int out_size) {
             PQgetvalue(res, i, 1)); // FullName
         strncat(out, row, out_size - strlen(out) - 1);
         if (i < rows - 1)
-            strncat(out, "l", out_size - strlen(out) - 1);
+            strncat(out, ";", out_size - strlen(out) - 1);
     }
     PQclear(res);
 }

@@ -1,4 +1,4 @@
-import {addBook, deleteBook, getAuthors, getBook, getBooks} from '../api.js';
+import { addBook, deleteBook, getAuthors, getBook, getBooks } from '../api.js';
 
 // Page status
 let allBooks = [];    // All books loaded from server
@@ -39,39 +39,35 @@ async function loadAuthors() {
 
 // Render
 
-// Drawing all page - table and form
+// Drawing table head
 function renderTableHead() {
-    const tbody = document.getElementById('table-body');
+    document.getElementById('table-head').innerHTML = `
+        <th>ID</th>
+        <th>Название</th>
+        <th>Автор</th>
+        <th>Год</th>
+        <th>Действия</th>
+    `;
 
-    if (books.length === 0) {
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="5" style="text-align:center; color:#999; padding:32px;">
-                    Книги не найдены
-                </td>
-            </tr>`;
-        return;
-    }
-
-    tbody.innerHTML = books
-                          .map(book => `
-        <tr>
-            <td>${book.id}</td>
-            <td>${book.name}</td>
-            <td>${book.author}</td>
-            <td>${book.year}</td>
-            <td>
-                <button class="btn-edit">
-                        onclick="window.editBook('${book.id}')">
-                        Change
-                </button>
-                <button class="btn-delete"
-                        onclick="window.deleteBookById('${book.id}')">
-                        Delete
-                </button>
-            </td>
-        <tr>
-    `).join('');
+    // tbody.innerHTML = 
+    //     .map(book => `
+    //     <tr>
+    //         <td>${book.id}</td>
+    //         <td>${book.name}</td>
+    //         <td>${book.author}</td>
+    //         <td>${book.year}</td>
+    //         <td>
+    //             <button class="btn-edit">
+    //                     onclick="window.editBook('${book.id}')">
+    //                     Change
+    //             </button>
+    //             <button class="btn-delete"
+    //                     onclick="window.deleteBookById('${book.id}')">
+    //                     Delete
+    //             </button>
+    //         </td>
+    //     <tr>
+    // `).join('');
 }
 
 // Filling tbody with book strings
@@ -89,7 +85,7 @@ function renderTable(books) {
     }
 
     tbody.innerHTML = books
-                          .map(book => `
+        .map(book => `
         <tr data-id="${book.id}">
             <td>${book.id}</td>
             <td>${book.name}</td>
@@ -109,62 +105,76 @@ function renderTable(books) {
     `).join('');
 }
 
+// Modal window
+
+// Filling #modal-fields 
+function renderModalFields(book = null) {
+    // Building drop-down authors list
+    const authorOptions = allAuthors.map(a =>
+        `<option value="${a.id}" ${book && book.authorId == a.id ? 'selected' : ''}>
+            ${a.name}
+        </option>`
+    ).join('');
+
+    document.getElementById('modal-fields').innerHTML = `
+    <label>Название</label>
+    <input type="text" id="book-name"
+           value="${book ? book.name : ''}"
+           placeholder="Название книги" />
+           
+    <label>Автор</label>
+    <select id="book-author-select">
+        <option value="">Выберите автора...</option>
+        ${authorOptions}
+    </select>
+    
+    <label>Год издания</label>
+    <input type="number" id="book-year"
+           value="${book ? book.year : ''}"
+           placeholder="Год" min="1000" max="2100" />
+    `;
+}
+
+// Open modal window
+function openModal(book = null) {
+    document.getElementById('modal-title').textContent =
+        book ? 'Редактировать книгу' : 'Добавить книгу';
+
+    renderModalFields(book);
+
+    document.getElementById('modal-overlay').classList.remove('hidden');
+}
+
+// Close modal window
+function closeModal() {
+    document.getElementById('modal-overlay').classList.add('hidden');
+    editingId = null;
+}
+
 // Event processors
 function bindEvents() {
     // On "Add" book open empty form
-    document.getElementById('btn-add-book').addEventListener('click', () => {
+    document.getElementById('add-record-btn').onclick = () => {
         editingId = null;
         openModal();
-    });
+    };
 
-    // Button "Save" on form
-    document.getElementById('btn-save').addEventListener('click', saveBook);
+    // Button "Close" on form
+    document.getElementById('close-modal').onclick = closeModal;
 
     // Button "Back" on form
-    document.getElementById('btn-cancel').addEventListener('click', closeModal);
+    document.getElementById('cancel-btn').onclick = closeModal;
 
     // Click on overlay closing modal
-    document.getElementById('modal-overlay').addEventListener('click', (e) => {
+    document.getElementById('modal-overlay').onclick = (e) => {
         if (e.target.id === 'modal-overlay')
             closeModal();
-    });
+    };
 
-    // Search - filter the table locally without request to server
-    document.getElementById('book-search').addEventListener('input', (e) => {
-        const query = e.target.value.toLowerCase();
-        const filtered =
-            allBooks.filter(book => book.name.toLowerCase().includes(query) ||
-                                    book.author.toLowerCase().includes(query));
-        renderTable(filtered);
-    });
-}
-
-// Modal window
-
-function openModal(book = null) {
-    const modal = document.getElementById('modal-overlay');
-    const title = document.getElementById('modal-title');
-
-    if (book) {
-        // Editing mode
-        title.textContent = 'Edit book';
-        document.getElementById('book-name').value = book.name;
-        document.getElementById('book-year').value = book.year;
-        document.getElementById('book-author-select').value =
-            book.authorId || '';
-    } else {
-        // Adding mode
-        title.textContent = 'Add book';
-        document.getElementById('book-name').value = '';
-        document.getElementById('book-year').value = '';
-    }
-
-    modal.style.display = 'flex';
-}
-
-function closeModal() {
-    document.getElementById('modal-overlay').style.display = 'none';
-    editingId = null;
+    document.getElementById('modal-form').onsubmit = async (e) => {
+        e.preventDefault();
+        await saveBook();
+    };
 }
 
 // CRUD operations
@@ -184,8 +194,9 @@ async function saveBook() {
     let response;
     if (editingId) {
         // Editing
-        response = await sendCommand(
-            `UPDATE_BOOK|${editingId}|${name}|${authorId}|${year}`);
+        response = await window.sendCommand(
+            `UPDATE_BOOK|${editingId}|${name}|${authorId}|${year}`
+        ).then(r => JSON.parse(r));
     } else {
         // Adding new book
         response = await addBook(name, authorId, year);
@@ -200,8 +211,7 @@ async function saveBook() {
 }
 
 // Open edit form for particular book
-window.editBook =
-    async function(id) {
+window.editBook = async function (id) {
     editingId = id;
     const response = await getBook(id);
 
@@ -210,33 +220,31 @@ window.editBook =
     } else {
         alert('Can\'t load book data');
     }
-}
+};
 
-    // Delete book with submit
-    window.deleteBookById =
-        async function(id) {
+// Delete book with submit
+window.deleteBookById = async function (id) {
     const book = allBooks.find(b => b.id === id);
     const name = book ? book.name : `#${id}`;
-    if (!confirm(`Delete book "${name}"?`))
-        return;
-
+    if (!confirm(`Delete book "${name}"?`)) return;
+    
     const response = await deleteBook(id);
     if (response.status === 'ok') {
         await loadBooks(); // Reloading list
     } else {
         alert('Deleting error: ' + response.message);
     }
-}
+};
 
 // Additional
 
-function showLoading(visible) {
-    document.getElementById('loading').style.display =
-        visible ? 'block' : 'none';
-}
-
 function showError(msg) {
-    const el = document.getElementById('error-msg');
-    el.textContent = msg;
-    el.style.display = 'block';
+    const tbody = document.getElementById('table-body');
+    tbody.innerHTML = `
+        <tr>
+            <td colspan="5"
+                style="color:#ef4444; padding:16px; text-align:center;">
+                ${msg}
+            </td>
+        </tr>`;
 }

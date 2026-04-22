@@ -80,6 +80,19 @@ json parse_response(const std::string& response) {
         };
     }
 
+    if (parts.size() == 3) {
+        // Проверяем что parts[1] это число — значит это ответ LOGIN
+        bool is_number = !parts[1].empty() && 
+                         std::all_of(parts[1].begin(), parts[1].end(), ::isdigit);
+        if (is_number) {
+            return {
+                {"status", "ok"},
+                {"id",     parts[1]},
+                {"name",   parts[2]}
+            };
+        }
+    }
+
     // Data - all after first '|'
     std::string data_str = parts.size() > 1 ? parts[1] : "";
 
@@ -137,9 +150,10 @@ int main() {
                 return json{{"status", "error"}, {"message", "No command"}}.dump();
             }
 
-            std::string raw = args[0].get<std::string>();
+            std::string command = args[0].get<std::string>();
+            std::cout << "[client] Sending command: " << command << std::endl;
+            std::string raw = send_to_server(command);
             std::cout << "[client] Raw response: " << raw << std::endl;
-
             json result = parse_response(raw);
             return result.dump();
         });
