@@ -1,5 +1,5 @@
-cd ui && npm run build
-cd ../build && cmake --build .
+###### cd ui && npm run build
+###### cd ../build && cmake --build .
 
 # C++ WebView GUI Starter Example
 

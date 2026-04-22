@@ -43,31 +43,12 @@ async function loadAuthors() {
 function renderTableHead() {
     document.getElementById('table-head').innerHTML = `
         <th>ID</th>
-        <th>Название</th>
-        <th>Автор</th>
-        <th>Год</th>
-        <th>Действия</th>
+        <th>Name</th>
+        <th>Author</th>
+        <th>Year</th>
+        <th>Cost</th>
+        <th>Actions</th>
     `;
-
-    // tbody.innerHTML = 
-    //     .map(book => `
-    //     <tr>
-    //         <td>${book.id}</td>
-    //         <td>${book.name}</td>
-    //         <td>${book.author}</td>
-    //         <td>${book.year}</td>
-    //         <td>
-    //             <button class="btn-edit">
-    //                     onclick="window.editBook('${book.id}')">
-    //                     Change
-    //             </button>
-    //             <button class="btn-delete"
-    //                     onclick="window.deleteBookById('${book.id}')">
-    //                     Delete
-    //             </button>
-    //         </td>
-    //     <tr>
-    // `).join('');
 }
 
 // Filling tbody with book strings
@@ -92,11 +73,14 @@ function renderTableBody(books) {
             <td>${book.name}</td>
             <td>${book.author}</td>
             <td>${book.year}</td>
+            <td>${book.cost}</td>
             <td>
-                <button class="btn-edit" onclick="window.editBook('${book.id}')">
+                <button class="btn-edit" onclick="window.editBook('${
+                                   book.id}')">
                     Изменить
                 </button>
-                <button class="btn-delete" onclick="window.deleteBookById('${book.id}')">
+                <button class="btn-delete" onclick="window.deleteBookById('${
+                                   book.id}')">
                     Удалить
                 </button>
             </td>
@@ -200,7 +184,7 @@ async function saveBook() {
     let response;
     if (editingId) {
         // Editing
-        response = await editBook(name, authorId, year, cost);
+        response = await editBook(editingId, name, authorId, year, cost);
         // window.sendCommand(
         //     `UPDATE_BOOK|${editingId}|${name}|${authorId}|${year}|${cost}`
         // ).then(r => JSON.parse(r));

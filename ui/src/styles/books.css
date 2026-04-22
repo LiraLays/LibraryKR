@@ -22,6 +22,7 @@
 .books-table {
     width: 100%;
     border-collapse: collapse;
+    border: 1px solid black;
 }
 
 .books-table th,
@@ -29,6 +30,7 @@
     padding: 10px 14px;
     border-bottom: 1px solid #eee;
     text-align: left;
+    border: 1px solid black;
 }
 
 .books-table th {

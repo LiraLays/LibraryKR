@@ -11,7 +11,12 @@ export async function initAuthorsPage() {
 }
 
 async function loadAuthors() {
+    console.log('loadAuthors: calling getAuthors...');
     const response = await getAuthors();
+    console.log('loadAuthors response status:', response.status);
+    console.log('loadAuthors data length:',
+                response.data ? response.data.length : 'no data');
+
     if (response.status === 'ok') {
         allAuthors = response.data;
         renderTableBody(allAuthors);
@@ -31,10 +36,8 @@ function renderTableHead() {
 // Filling tbody with author strings
 function renderTableBody(authors) {
     const tbody = document.getElementById('table-body');
-    if (!tbody)
-        return;
 
-    if (books.length === 0) {
+    if (authors.length === 0) {
         tbody.innerHTML = `
             <tr>
                 <td colspan="3" style="text-align:center; color:#999; padding:32px;">
@@ -82,7 +85,7 @@ function closeModal() {
 }
 
 function bindEvents() {
-    document.getElementById('add-record-bin').onclick = () => {
+    document.getElementById('add-record-btn').onclick = () => {
         editingId = null;
         openModal();
     };
@@ -98,7 +101,7 @@ function bindEvents() {
 }
 
 async function saveAuthor() {
-    const name = document.getElementById('author-name').ariaValueMax.trim();
+    const name = document.getElementById('author-name').value.trim();
     if (!name) { alert('Input author name'); return; }
 
     const response = editingId
@@ -119,7 +122,7 @@ window.editAuthor = function(id) {
     if (author) openModal(author);
 };
 
-window.deleteAuthor = async function(id) {
+window.deleteAuthorById = async function(id) {
     const author = allAuthors.find(a => a.id === id);
     if (!confirm(`Delete author "${author ? author.name : id}"?`)) return;
     const response = await deleteAuthor(id);

@@ -108,18 +108,21 @@ json parse_response(const std::string& response) {
     for (auto& row : rows) {
         auto fields = split(row, ',');
         // Book: id, name, author, year
-        if (fields.size() >= 4) {
-            data.push_back({
-                {"id",     fields[0]},
-                {"name",   fields[1]},
-                {"author", fields[2]},
-                {"year",   fields[3]}
-            });
-        } else if (fields.size() == 2) {
-            data.push_back({
-                {"id", fields[0]},
-                {"name", fields[1]}
-            });
+        if (fields.size() == 2) {
+            data.push_back(
+                {
+                    {"id", fields[0]}, 
+                    {"name", fields[1]}
+                });
+        } else if (fields.size() >= 5) {
+            data.push_back(
+                {
+                    {"id", fields[0]},
+                    {"name", fields[1]},
+                    {"author", fields[2]},
+                    {"year", fields[3]},
+                    {"cost", fields[4]}
+                });
         }
     }
 

@@ -23,8 +23,8 @@ export async function addBook(name, authorId, year, cost) {
     return await sendCommand(`ADD_BOOK|${name}|${authorId}|${year}|${cost}`);
 }
 
-export async function editBook(name, authorId, year, cost) {
-    return await sendCommand(`UPDATE_BOOK|${name}|${authorId}|${year}|${cost}`);
+export async function editBook(editingId, name, authorId, year, cost) {
+    return await sendCommand(`UPDATE_BOOK|${editingId}|${name}|${authorId}|${year}|${cost}`);
 }
 
 // Delete book

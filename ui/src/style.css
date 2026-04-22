@@ -88,12 +88,13 @@ input:focus { border-color: var(--primary); }
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 1rem;
+  border: 1px solid black;
 }
 
 .data-table th, .data-table td {
   text-align: left;
   padding: 12px;
-  border-bottom: 1px solid var(--border);
+  border: 1px solid black;
 }
 
 .status-ok {
