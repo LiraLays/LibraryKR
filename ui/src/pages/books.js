@@ -1,4 +1,4 @@
-import { addBook, deleteBook, getAuthors, getBook, getBooks } from '../api.js';
+import { addBook, editBook, deleteBook, getAuthors, getBook, getBooks } from '../api.js';
 
 // Page status
 let allBooks = [];    // All books loaded from server
@@ -131,6 +131,11 @@ function renderModalFields(book = null) {
     <input type="number" id="book-year"
            value="${book ? book.year : ''}"
            placeholder="Год" min="1000" max="2100" />
+
+    <label>Цена</label>
+    <input type="number" id="book-cost"
+           value="${book ? (book.cost || '') : ''}"
+           placeholder="Цена" min="0" step="0.01" />     
     `;
 }
 
@@ -183,9 +188,11 @@ async function saveBook() {
     const name = document.getElementById('book-name').value.trim();
     const authorId = document.getElementById('book-author-select').value;
     const year = document.getElementById('book-year').value.trim();
+    const cost = document.getElementById('book-cost').value.trim();
+
 
     // Simple validation
-    if (!name || !authorId || !year) {
+    if (!name || !authorId || !year || !cost) {
         alert('Fill all fields!');
         return;
     }
@@ -193,12 +200,13 @@ async function saveBook() {
     let response;
     if (editingId) {
         // Editing
-        response = await window.sendCommand(
-            `UPDATE_BOOK|${editingId}|${name}|${authorId}|${year}`
-        ).then(r => JSON.parse(r));
+        response = await editBook(name, authorId, year, cost);
+        // window.sendCommand(
+        //     `UPDATE_BOOK|${editingId}|${name}|${authorId}|${year}|${cost}`
+        // ).then(r => JSON.parse(r));
     } else {
         // Adding new book
-        response = await addBook(name, authorId, year);
+        response = await addBook(name, authorId, year, cost);
     }
 
     if (response.status === 'ok') {

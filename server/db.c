@@ -80,17 +80,16 @@ void db_get_book(PGconn *conn, const char *id, char *out, int out_size) {
 }
 
 // Добавить книгу - использования параметризованного запроса (защита от SQL-инъекций)
-void db_add_book(PGconn *conn, const char *name, const char *author_id, const char *year, char *out, int out_size) {
+void db_add_book(PGconn *conn, const char *name, const char *author_id, const char *year, const char *cost, char *out, int out_size) {
     
+    const char* params[4] = { name, author_id, year, cost};
     // $1 $2 $3 - плейсхолдеры для параметровs
     const char *sql = 
-    "INSERT INTO Book (BookName, IdAuthor, IdGroup, PublicationYear, IdPublisher) "
-    "VALUES ($1, $2, 1, $3, 1)";
-
-    const char *params[3] = { name, author_id, year };
+    "INSERT INTO Book (BookName, IdAuthor, IdGroup, PublicationYear, IdPublisher, Cost) "
+    "VALUES ($1, $2, 1, $3, 1, $4)";
 
     PGresult *res = PQexecParams(conn, sql,
-        3,      // количество параметров
+        4,      // количество параметров
         NULL,   // типы параметров (NULL = определить автоматически)
         params, // значения параметров
         NULL,   // длины (NULL = строки с \0)
@@ -102,6 +101,21 @@ void db_add_book(PGconn *conn, const char *name, const char *author_id, const ch
     } else {
         snprintf(out, out_size, "OK|Book added");
     }
+    PQclear(res);
+}
+
+// Editing book
+void db_update_book(PGconn *conn, const char *id, const char *name, const char *author_id, const char *year, const char *cost, char *out, int out_size) {
+    const char *params[5] = { name, author_id, year, cost, id };
+    PGresult *res = PQexecParams(conn, 
+        "UPDATE Book SET BookName=$1, IdAuthor=$2, "
+        "PublicationYear=$3, Cost=$4 WHERE IdBook=$5", 
+        5, NULL, params, NULL, NULL, 0);
+
+    if (PQresultStatus(res) != PGRES_COMMAND_OK)
+        snprintf(out, out_size, "ERROR|%s", PQerrorMessage(conn));
+    else
+        snprintf(out, out_size, "OK|Book updated");
     PQclear(res);
 }
 
@@ -117,6 +131,45 @@ void db_delete_book(PGconn *conn, const char *id, char *out, int out_size) {
     } else {
         snprintf(out, out_size, "OK|Book deleted");
     }
+    PQclear(res);
+}
+
+// Adding author
+void db_add_author(PGconn *conn, const char *name, char *out, int out_size) {
+    const char *params[1] = {name};
+    PGresult *res = PQexecParams(conn, 
+        "INSERT INTO Author (FullName) VALUES ($1)",
+        1, NULL, params, NULL, NULL, 0);
+    if (PQresultStatus(res) != PGRES_COMMAND_OK)
+        snprintf(out, out_size, "ERROR|%s", PQerrorMessage(conn));
+    else 
+        snprintf(out, out_size, "OK|Author added");
+    PQclear(res);
+}
+
+// Editing author
+void db_update_author(PGconn *conn, const char *id, const char *name, char *out, int out_size) {
+    const char *params[2] = { name, id };
+    PGresult *res = PQexecParams(conn,
+        "UPDATE Author SET FullName=$1 WHERE IdAuthor=$2",
+        2, NULL, params, NULL, NULL, 0);
+    if (PQresultStatus(res) != PGRES_COMMAND_OK)
+        snprintf(out, out_size, "ERROR|%s", PQerrorMessage(conn));
+    else 
+        snprintf(out, out_size, "OK|Author updated");
+    PQclear(res);
+}
+
+// Deleting author
+void db_delete_author(PGconn *conn, const char *id, char *out, int out_size) {
+    const char *params[1] = { id };
+    PGresult *res = PQexecParams(conn,
+        "DELETE FROM Author WHERE IdAuthor=$1",
+        1, NULL, params, NULL, NULL, 0);
+    if (PQresultStatus(res) != PGRES_COMMAND_OK)
+        snprintf(out, out_size, "ERROR|%s", PQerrorMessage(conn));
+    else
+        snprintf(out, out_size, "OK|Author deleted");
     PQclear(res);
 }
 

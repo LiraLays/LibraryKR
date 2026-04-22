@@ -2,6 +2,7 @@ import '../src/style.css' // или правильный путь до твои�
 import '../src/styles/books.css'
 
 import { initBooksPage } from "./pages/books.js";
+import { initAuthorsPage } from "./pages/authors.js";
 
 document.getElementById('login-btn').addEventListener('click', async () => {
     const login = document.getElementById('username').value.trim();
@@ -41,6 +42,9 @@ document.getElementById('table-navigation').addEventListener('click', (e) => {
     switch (table) {
     case 'books':
         initBooksPage();
+        break;
+    case 'authors':
+        initAuthorsPage();
         break;
     }
 });

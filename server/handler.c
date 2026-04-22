@@ -36,7 +36,7 @@ void handle_command(PGconn *conn, char *cmd_str, char *response, int resp_size) 
         db_get_book(conn, parts[1], response, resp_size);
     } 
     else if (strcmp(cmd, "ADD_BOOK") == 0 && n >= 4) {
-        db_add_book(conn, parts[1], parts[2], parts[3], response, resp_size);
+        db_add_book(conn, parts[1], parts[2], parts[3], parts[4], response, resp_size);
     }
     else if (strcmp(cmd, "DELETE_BOOK") == 0 && n >= 2) {
         db_delete_book(conn, parts[1], response, resp_size);
@@ -46,6 +46,20 @@ void handle_command(PGconn *conn, char *cmd_str, char *response, int resp_size) 
     }
     else if (strcmp(cmd, "GET_AUTHORS") == 0) {
         db_get_authors(conn, response, resp_size);
+    }
+    else if (strcmp(cmd, "UPDATE_BOOK") == 0 && n >= 6) {
+        // UPDATE_BOOK|id|name|author_id|year|cost
+        db_update_book(conn, parts[1], parts[2], parts[3],
+                        parts[4], parts[5], response, resp_size);
+    }
+    else if (strcmp(cmd, "ADD_AUTHOR") == 0 && n >= 2) {
+        db_add_author(conn, parts[1], response, resp_size);
+    }
+    else if (strcmp(cmd, "UPDATE_AUTHOR") == 0 && n >= 3) {
+        db_update_author(conn, parts[1], parts[2], response, resp_size);
+    }
+    else if (strcmp(cmd, "DELETE_AUTHOR") == 0 && n >= 2) {
+        db_delete_author(conn, parts[1], response, resp_size);
     }
     else {
         snprintf(response, resp_size, "ERROR|Unknown command: %s", cmd);

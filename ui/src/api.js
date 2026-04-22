@@ -19,13 +19,32 @@ export async function getBook(id) {
 
 // Add book
 // Return: { status: "ok", message: "..."}
-export async function addBook(name, authorId, year) {
-    return await sendCommand(`ADD_BOOK|${name}|${authorId}|${year}`);
+export async function addBook(name, authorId, year, cost) {
+    return await sendCommand(`ADD_BOOK|${name}|${authorId}|${year}|${cost}`);
+}
+
+export async function editBook(name, authorId, year, cost) {
+    return await sendCommand(`UPDATE_BOOK|${name}|${authorId}|${year}|${cost}`);
 }
 
 // Delete book
 export async function deleteBook(id) {
     return await sendCommand(`DELETE_BOOK|${id}`);
+}
+
+// Add author
+export async function addAuthor(name) {
+    return await sendCommand(`ADD_AUTHOR|${name}`);
+}
+
+// Edit author
+export async function updateAuthor(id, name) {
+    return await sendCommand(`UPDATE_AUTHOR|${id}|${name}`);
+}
+
+// Delete author
+export async function deleteAuthor(id) {
+    return await sendCommand(`DELETE_AUTHOR|${id}`);
 }
 
 // Authors
