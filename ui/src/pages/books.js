@@ -71,34 +71,33 @@ function renderTableHead() {
 }
 
 // Filling tbody with book strings
-function renderTable(books) {
-    const tbody = document.getElementById('books-tbody');
+function renderTableBody(books) {
+    const tbody = document.getElementById('table-body');
     if (!tbody)
         return;
 
     if (books.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="5" class="empty">Books not found</td>
+                <td colspan="5" style="text-align:center; color:#999; padding:32px;">
+                    Books not found
+                </td>
             </tr>`;
         return;
     }
 
-    tbody.innerHTML = books
-        .map(book => `
-        <tr data-id="${book.id}">
+    tbody.innerHTML = books.map(book => `
+        <tr>
             <td>${book.id}</td>
             <td>${book.name}</td>
             <td>${book.author}</td>
             <td>${book.year}</td>
-            <td class="actions">
-                <button class="btn btn-small btn-secondary"
-                    onclick="editBook('${book.id}')">
-                    Edit
+            <td>
+                <button class="btn-edit" onclick="window.editBook('${book.id}')">
+                    Изменить
                 </button>
-                <button class="btn btn-small btn-danger"
-                    onclick="deleteBookById('${book.id}')">
-                    Delete
+                <button class="btn-delete" onclick="window.deleteBookById('${book.id}')">
+                    Удалить
                 </button>
             </td>
         </tr>

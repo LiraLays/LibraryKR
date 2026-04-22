@@ -1,7 +1,6 @@
 // Base function - sending command and return parsed JSON
 async function sendCommand(command) {
-    const raw = await window.sendCommand(command);
-    return JSON.parse(raw);
+    return await window.sendCommand(command);
 }
 
 // Books

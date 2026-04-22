@@ -1,7 +1,7 @@
 import '../src/style.css' // или правильный путь до твоих css файлов
 import '../src/styles/books.css'
 
-import {initBooksPage} from "./pages/books.js";
+import { initBooksPage } from "./pages/books.js";
 
 document.getElementById('login-btn').addEventListener('click', async () => {
     const login = document.getElementById('username').value.trim();
@@ -12,10 +12,7 @@ document.getElementById('login-btn').addEventListener('click', async () => {
         return;
     }
 
-    const raw = await window.sendCommand(`LOGIN|${login}|${password}`);
-    console.log('Raw login response:', raw); // ← добавь эту строку
-    const response = JSON.parse(raw);
-    console.log('Parsed response:', JSON.stringify(response)); // ← и эту
+    const response = await window.sendCommand(`LOGIN|${login}|${password}`);
 
     if (response.status === 'ok') {
         document.getElementById('auth-section').classList.add('hidden');
@@ -49,12 +46,12 @@ document.getElementById('table-navigation').addEventListener('click', (e) => {
 });
 
 // Simple router - show desired page
-function navigate(page) {
-    switch (page) {
-    case 'books':
-        initBooksPage();
-        break;
-    }
-}
+// function navigate(page) {
+//     switch (page) {
+//         case 'books':
+//             initBooksPage();
+//             break;
+//     }
+// }
 
-navigate('books');
+// navigate('books');

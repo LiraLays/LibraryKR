@@ -115,6 +115,11 @@ json parse_response(const std::string& response) {
                 {"author", fields[2]},
                 {"year",   fields[3]}
             });
+        } else if (fields.size() == 2) {
+            data.push_back({
+                {"id", fields[0]},
+                {"name", fields[1]}
+            });
         }
     }
 
@@ -152,8 +157,14 @@ int main() {
 
             std::string command = args[0].get<std::string>();
             std::cout << "[client] Sending command: " << command << std::endl;
+            
             std::string raw = send_to_server(command);
             std::cout << "[client] Raw response: " << raw << std::endl;
+            
+            if (raw.empty()) {
+               return json{{"status", "error"}, {"message", "Empty response from server"}}.dump();
+            }
+
             json result = parse_response(raw);
             return result.dump();
         });
