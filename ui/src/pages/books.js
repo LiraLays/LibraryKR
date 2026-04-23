@@ -9,7 +9,7 @@ let editingId = null;   // Id edited book (null = add)
 
 // Entry point
 export async function initBooksPage() {
-    document.getElementById('current-table-name').textContent = 'Книги';
+    document.getElementById('current-table-name').textContent = 'Books';
 
     renderTableHead(); // Rendering table head
 
@@ -102,11 +102,11 @@ function renderTableBody(books) {
             <td>
                 <button class="btn-edit" onclick="window.editBook('${
                                    book.id}')">
-                    Изменить
+                    Edit
                 </button>
                 <button class="btn-delete" onclick="window.deleteBookById('${
                                    book.id}')">
-                    Удалить
+                    Delete
                 </button>
             </td>
         </tr>
@@ -135,14 +135,10 @@ function renderModalFields(book = null) {
         </option>`).join('');
 
     document.getElementById('modal-fields').innerHTML = `
-    <label>Название</label>
-    <input type="text" id="book-name"
-           value="${book ? book.name : ''}"
-           placeholder="Название книги" />
-           
-    <label>Автор</label>
+    
+    <label>Author</label>
     <select id="book-author-select">
-        <option value="">Выберите автора...</option>
+        <option value="">Select author...</option>
         ${authorOptions}
     </select>
 
@@ -157,6 +153,11 @@ function renderModalFields(book = null) {
         <option value="">Select publisher...</option>
         ${publisherOptions}
     </select>
+
+    <label>Book</label>
+    <input type="text" id="book-name"
+           value="${book ? book.name : ''}"
+           placeholder="Book name" />
     
     <label>Год издания</label>
     <input type="number" id="book-year"
@@ -216,14 +217,15 @@ function bindEvents() {
 
 // Save book (add or update)
 async function saveBook() {
+    const author_id = document.getElementById('book-author-select').value;
+    const group_id = document.getElementById('book-group-select').value;
     const name = document.getElementById('book-name').value.trim();
-    const authorId = document.getElementById('book-author-select').value;
     const year = document.getElementById('book-year').value.trim();
+    const publisher_id = document.getElementById('book-publisher-select').value;
     const cost = document.getElementById('book-cost').value.trim();
 
-
     // Simple validation
-    if (!name || !authorId || !year || !cost) {
+    if (!author_id || !group_id || !publisher_id || !name || !year || !cost) {
         alert('Fill all fields!');
         return;
     }
@@ -231,13 +233,14 @@ async function saveBook() {
     let response;
     if (editingId) {
         // Editing
-        response = await editBook(editingId, name, authorId, year, cost);
+        response = await editBook(editingId, author_id, group_id, name, year,
+                                  publisher_id, cost);
         // window.sendCommand(
         //     `UPDATE_BOOK|${editingId}|${name}|${authorId}|${year}|${cost}`
         // ).then(r => JSON.parse(r));
     } else {
         // Adding new book
-        response = await addBook(name, authorId, year, cost);
+        response = await addBook(author_id, group_id, name, year, publisher_id, cost);
     }
 
     if (response.status === 'ok') {

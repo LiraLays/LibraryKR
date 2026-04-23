@@ -37,13 +37,12 @@ void handle_command(PGconn *conn, char *cmd_str, char *response, int resp_size) 
     else if (strcmp(cmd, "GET_BOOK") == 0 && n >= 2)
         db_get_book(conn, parts[1], response, resp_size);
     
-    else if (strcmp(cmd, "ADD_BOOK") == 0 && n >= 4)
-        db_add_book(conn, parts[1], parts[2], parts[3], parts[4], response, resp_size);
-    
-    else if (strcmp(cmd, "UPDATE_BOOK") == 0 && n >= 6)
-        db_update_book(conn, parts[1], parts[2], parts[3], parts[4], parts[5],
-                       response, resp_size);
-    
+    else if (strcmp(cmd, "ADD_BOOK") == 0 && n >= 7)
+        db_add_book(conn, parts[1], parts[2], parts[3], parts[4], parts[5], parts[6], response, resp_size);
+
+    else if (strcmp(cmd, "UPDATE_BOOK") == 0 && n >= 8)
+        db_update_book(conn, parts[1], parts[2], parts[3], parts[4], parts[5], parts[6], parts[7], response, resp_size);
+
     else if (strcmp(cmd, "DELETE_BOOK") == 0 && n >= 2)
         db_delete_book(conn, parts[1], response, resp_size);
     
@@ -131,6 +130,24 @@ void handle_command(PGconn *conn, char *cmd_str, char *response, int resp_size) 
 
     else if (strcmp(cmd, "DELETE_PUBLISHER") == 0 && n >= 2)
         db_delete_publisher(conn, parts[1], response, resp_size);
+
+    // Bookissue operations
+    else if (strcmp(cmd, "GET_BOOKISSUES") == 0)
+        db_get_bookissues(conn, response, resp_size);
+
+    else if (strcmp(cmd, "GET_BOOKISSUE") == 0 && n >= 2)
+        db_get_bookissue(conn, parts[1], response, resp_size);
+
+    else if (strcmp(cmd, "ADD_BOOKISSUE") == 0 && n >= 6)
+        db_add_bookissue(conn, parts[1], parts[2], parts[3], parts[4], parts[5],
+                         response, resp_size);
+
+    else if (strcmp(cmd, "UPDATE_BOOKISSUE") == 0 && n >= 7)
+        db_update_bookissue(conn, parts[1], parts[2], parts[3], parts[4],
+                            parts[5], parts[6], response, resp_size);
+
+    else if (strcmp(cmd, "DELETE_BOOKISSUE") == 0 && n >= 2)
+        db_delete_bookissue(conn, parts[1], response, resp_size);
 
     // OTHER
     else

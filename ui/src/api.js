@@ -19,12 +19,13 @@ export async function getBook(id) {
 
 // Add book
 // Return: { status: "ok", message: "..."}
-export async function addBook(name, authorId, year, cost) {
-    return await sendCommand(`ADD_BOOK|${name}|${authorId}|${year}|${cost}`);
+export async function addBook(author_id, group_id, name, year, publisher_id, cost) {
+    return await sendCommand(`ADD_BOOK|${author_id}|${group_id}|${name}|${year}|${publisher_id}|${cost}`);
 }
 
-export async function editBook(editingId, name, authorId, year, cost) {
-    return await sendCommand(`UPDATE_BOOK|${editingId}|${name}|${authorId}|${year}|${cost}`);
+export async function editBook(editingId, author_id, group_id, name, year,
+                               publisher_id, cost) {
+    return await sendCommand(`UPDATE_BOOK|${editingId}|${author_id}|${group_id}|${name}|${year}|${publisher_id}|${cost}`);
 }
 
 // Delete book
@@ -156,4 +157,31 @@ export async function updatePublisher(id, name) {
 // Delete publisher
 export async function deletePublisher(id) {
     return await sendCommand(`DELETE_PUBLISHER|${id}`);
+}
+
+// ----------------------------------------------- Book issues -----------------------------------------------
+export async function getBookIssues() {
+    return await sendCommand("GET_BOOKISSUES");
+}
+
+// Get BookIssue
+export async function getBookIssue(id) {
+    return await sendCommand(`GET_BOOKISSUE|${id}`);
+}
+
+// Add BookIssue
+export async function addBookIssue(client_id, book_id, issuedate, duedate, returndate) {
+    return await sendCommand(
+        `ADD_BOOKISSUE|${client_id}|${book_id}|${issuedate}|${duedate}|${returndate}`);
+}
+
+// Edit BookIssue
+export async function updateBookIssue(editingId, client_id, book_id, issuedate, duedate, returndate) {
+    return await sendCommand(`UPDATE_BOOKISSUE|${editingId}|${client_id}|${
+        book_id}|${issuedate}|${duedate}|${returndate}`);
+}
+
+// Delete BookIssue
+export async function deleteBookIssue(id) {
+    return await sendCommand(`DELETE_BOOKISSUE|${id}`);
 }

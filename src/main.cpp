@@ -120,6 +120,14 @@ json parse_response(const std::string& response) {
                             {"enterprise", fields[2]},
                             {"workphone", fields[3]}
             });
+        } else if (fields.size() == 6) {
+            data.push_back({{"id", fields[0]},
+                            {"clientname", fields[1]},
+                            {"bookname", fields[2]},
+                            {"issuedate", fields[3]},
+                            {"duedate", fields[4]},
+                            {"returndate", fields[5]}
+                        });
         } else if (fields.size() == 7) {
             data.push_back({{"id", fields[0]},
                             {"name", fields[1]},

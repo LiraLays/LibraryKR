@@ -7,6 +7,7 @@ import { initReadersPage } from "./pages/readers.js";
 import { initEnterprisesPage } from "./pages/enterprises.js";
 import { initBookgroupsPage } from "./pages/bookgroups.js";
 import { initPublishersPage } from "./pages/publishers.js";
+import { initBookIssuesPage } from "./pages/bookissues.js";
 
 document.getElementById('login-btn').addEventListener('click', async () => {
     const login = document.getElementById('username').value.trim();
@@ -49,6 +50,9 @@ document.getElementById('table-navigation')
                 break;
             case 'readers':
                 initReadersPage();
+                break;
+            case 'bookissues':
+                initBookIssuesPage();
                 break;
             case 'enterprises':
                 initEnterprisesPage();

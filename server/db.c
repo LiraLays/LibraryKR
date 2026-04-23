@@ -117,18 +117,19 @@ void db_get_book(PGconn *conn, const char *id, char *out, int out_size) {
 
 // Добавить книгу - использования параметризованного запроса (защита от
 // SQL-инъекций)
-void db_add_book(PGconn *conn, const char *name, const char *author_id,
-                 const char *year, const char *cost, char *out, int out_size) {
+void db_add_book(PGconn *conn, const char *author_id, const char *group_id,
+                 const char *name, const char *year, const char *publisher_id,
+                 const char *cost, char *out, int out_size) {
 
-    const char *params[4] = {name, author_id, year, cost};
+    const char *params[6] = {author_id, group_id, name, year, publisher_id, cost};
     // $1 $2 $3 - плейсхолдеры для параметровs
-    const char *sql = "INSERT INTO book (bookname, idauthor, idgroup, "
-                      "publicationYear, idpublisher, cost) "
-                      "VALUES ($1, $2, 1, $3, 1, $4)";
+    const char *sql = "INSERT INTO book (idauthor, idgroup, bookname, "
+                      "publicationyear, idpublisher, cost) "
+                      "VALUES ($1, $2, $3, $4, $5, $6)";
 
     PGresult *res =
         PQexecParams(conn, sql,
-                     4,    // количество параметров
+                     6,    // количество параметров
                      NULL, // типы параметров (NULL = определить автоматически)
                      params, // значения параметров
                      NULL,   // длины (NULL = строки с \0)
@@ -144,14 +145,15 @@ void db_add_book(PGconn *conn, const char *name, const char *author_id,
 }
 
 // Editing book
-void db_update_book(PGconn *conn, const char *id, const char *name,
-                    const char *author_id, const char *year, const char *cost,
-                    char *out, int out_size) {
-    const char *params[5] = {name, author_id, year, cost, id};
-    PGresult *res = PQexecParams(conn,
-                                 "UPDATE book SET bookname=$1, idauthor=$2, "
-                                 "publicationyear=$3, cost=$4 WHERE idbook=$5",
-                                 5, NULL, params, NULL, NULL, 0);
+void db_update_book(PGconn *conn, const char *id, const char *author_id,
+                    const char *group_id, const char *name, const char *year,
+                    const char *publisher_id, const char *cost, char *out,
+                    int out_size) {
+    const char *params[7] = {author_id, group_id, name, year, publisher_id, cost, id};
+    const char *sql = "UPDATE book SET idauthor=$1, idgroup=$2, "
+                      "bookname=$3, publicationyear=$4, idpublisher=$5, cost=$6 "
+                      "WHERE idbook=$7";
+    PGresult *res = PQexecParams(conn, sql, 7, NULL, params, NULL, NULL, 0);
 
     if (PQresultStatus(res) != PGRES_COMMAND_OK)
         snprintf(out, out_size, "ERROR|%s", PQerrorMessage(conn));
@@ -680,11 +682,130 @@ void db_delete_publisher(PGconn *conn, const char *id, char *out,
     PQclear(res);
 }
 
-// // Get
-// void db_get_(PGconn *conn, char *out, int out_size) {}
-// // Add
-// void db_add_(PGconn *conn, char *out, int out_size) {}
-// // Update
-// void db_update_(PGconn *conn, char *out, int out_size) {}
-// // Delete
-// void db_delete_(PGconn *conn, char *out, int out_size) {}
+// ----------------------------------------------- Publishers -----------------------------------------------
+
+// Get bookissues
+void db_get_bookissues(PGconn *conn, char *out, int out_size) {
+    const char *sql = "SELECT bi.idorder, r.fullname, b.bookname, bi.issuedate, "
+                "bi.duedate, bi.returndate "
+                "FROM bookissue bi "
+                "JOIN reader r ON bi.idclient = r.idclient "
+                "JOIN book b ON bi.idbook = b.idbook "
+                "ORDER BY bi.idorder";
+    PGresult *res = PQexec(conn, sql);
+
+    if (PQresultStatus(res) != PGRES_TUPLES_OK) {
+        snprintf(out, out_size, "ERROR|%s", PQerrorMessage(conn));
+        PQclear(res);
+        return;
+    }
+
+    strcpy(out, "OK|");
+    int rows = PQntuples(res);
+    for (int i = 0; i < rows; i++) {
+        char row[512];
+        snprintf(row, sizeof(row), "%s,%s,%s,%s,%s,%s",
+                 PQgetvalue(res, i, 0), // idorder
+                 PQgetvalue(res, i, 1), // fullname
+                 PQgetvalue(res, i, 2), // bookname
+                 PQgetvalue(res, i, 3), // issuedate
+                 PQgetvalue(res, i, 4), // duedate
+                 PQgetvalue(res, i, 5)  // returndate
+        );
+        strncat(out, row, out_size - strlen(out) - 1);
+        if (i < rows - 1)
+            strncat(out, ";", out_size - strlen(out) - 1);
+    }
+    PQclear(res);
+}
+
+// Get bookissue
+void db_get_bookissue(PGconn *conn, const char *id, char *out, int out_size) {
+
+    const char *params[1] = { id };
+    const char *sql = "SELECT bi.idorder, r.fullname, b.bookname, bi.issuedate, "
+                "bi.duedate, bi.returndate "
+                "FROM bookissue bi "
+                "JOIN reader r ON bi.idclient = r.idclient "
+                "JOIN book b ON bi.idbook = b.idbook "
+                "WHERE bi.idorder = $1";
+    
+    PGresult *res = PQexecParams(conn, sql, 1, NULL, params, NULL, NULL, 0);
+
+    if (PQresultStatus(res) != PGRES_TUPLES_OK) {
+        snprintf(out, out_size, "ERROR|%s", PQerrorMessage(conn));
+        PQclear(res);
+        return;
+    }
+
+    strcpy(out, "OK|");
+    int rows = PQntuples(res);
+    for (int i = 0; i < rows; i++) {
+        char row[512];
+        snprintf(row, sizeof(row), "%s,%s,%s,%s,%s,%s",
+                 PQgetvalue(res, i, 0), // idorder
+                 PQgetvalue(res, i, 1), // fullname
+                 PQgetvalue(res, i, 2), // bookname
+                 PQgetvalue(res, i, 3), // issuedate
+                 PQgetvalue(res, i, 4), // duedate
+                 PQgetvalue(res, i, 5) // returndate
+        );
+        strncat(out, row, out_size - strlen(out) - 1);
+        if (i < rows - 1)
+            strncat(out, ";", out_size - strlen(out) - 1);
+    }
+    PQclear(res);
+}
+
+// Add bookissue
+void db_add_bookissue(PGconn *conn, const char *client_id, const char *book_id,
+                      const char *issuedate, const char *duedate,
+                      const char *returndate, char *out, int out_size) {
+    const char *params[5] = {client_id, book_id, issuedate, duedate, returndate};
+    const char *sql = "INSERT INTO bookissue (idclient, idbook, "
+                      "issuedate, duedate, returndate) "
+                      "VALUES ($1, $2, $3, $4, $5)";
+    
+    PGresult *res = PQexecParams(conn, sql, 5, NULL, params, NULL, NULL, 0);
+
+    if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+        snprintf(out, out_size, "ERROR|%s", PQerrorMessage(conn));
+    } else {
+        snprintf(out, out_size, "OK|Bookissue added");
+    }
+    PQclear(res);
+}
+// Update bookissue
+void db_update_bookissue(PGconn *conn, const char *id, const char *client_id,
+                         const char *book_id, const char *issuedate,
+                         const char *duedate, const char *returndate, char *out,
+                         int out_size) {
+    const char *params[6] = {client_id, book_id, issuedate, duedate,
+                             returndate, id};
+    const char *sql = "UPDATE bookissue "
+                      "SET idclient=$1, idbook=$2, issuedate=$3, "
+                      "duedate=$4, returndate=$5 "
+                      "WHERE idorder=$6";
+    PGresult *res = PQexecParams(conn, sql, 6, NULL, params, NULL, NULL, 0);
+
+    if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+        snprintf(out, out_size, "ERROR|%s", PQerrorMessage(conn));
+    } else {
+        snprintf(out, out_size, "OK|Bookissue updated");
+    }
+    PQclear(res);
+}
+// Delete bookissue
+void db_delete_bookissue(PGconn *conn, const char *id, char *out, int out_size) {
+    const char *params[1] = {id};
+    const char *sql = "DELETE FROM bookissue "
+                      "WHERE idorder = $1";
+    PGresult *res = PQexecParams(conn, sql, 1, NULL, params, NULL, NULL, 0);
+
+    if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+        snprintf(out, out_size, "ERROR|%s", PQerrorMessage(conn));
+    } else {
+        snprintf(out, out_size, "OK|Bookissue deleted");
+    }
+    PQclear(res);
+}
