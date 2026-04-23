@@ -6,7 +6,7 @@
 #include "db.h"
 #include "handler.h"
 
-#define PORT 8080
+#define PORT 44853
 #define BUFFER_SIZE 4096
 
 int main() {
@@ -27,7 +27,7 @@ int main() {
     server_addr.sin_addr.s_addr = INADDR_ANY;  // Принимать с любого интерфейса
     server_addr.sin_port        = htons(PORT); // htons = перевод в сетевой порядок 
 
-    if (bind(server_fd, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) {  // Сообщение ОС информации о том, что сокет слушает порт 8080
+    if (bind(server_fd, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
         perror("bind failed");
         return 1;
     }

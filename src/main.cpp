@@ -12,8 +12,8 @@
 
 using json = nlohmann::json;
 
-#define SERVER_HOST "127.0.0.1"
-#define SERVER_PORT 8080
+#define SERVER_HOST "82.179.140.18"
+#define SERVER_PORT 44853
 #define BUFFER_SIZE 4096
 
 // Sending command to C-server and returning answer in string format
