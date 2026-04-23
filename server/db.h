@@ -78,4 +78,34 @@ void db_update_bookissue(PGconn *conn, const char *id, const char *client_id,
                          const char *duedate, const char *returndate, char *out,
                          int out_size);
 void db_delete_bookissue(PGconn *conn, const char *id, char *out, int out_size);
+
+// Library operations
+void db_get_libraries(PGconn *conn, char *out, int out_size);
+void db_get_library(PGconn *conn, const char *id, char *out, int out_size);
+void db_add_library(PGconn *conn, const char *name, const char *address,
+                    char *out, int out_size);
+void db_update_library(PGconn *conn, const char *id, const char *name,
+                       const char *address, char *out, int out_size);
+void db_delete_library(PGconn *conn, const char *id, char *out, int out_size);
+
+// Employee operations
+void db_get_employees(PGconn *conn, char *out, int out_size);
+void db_get_employee(PGconn *conn, const char *id, char *out, int out_size);
+void db_add_employee(PGconn *conn, const char *name, const char *postion,
+                     const char *library_id, const char *phone, char *out,
+                     int out_size);
+void db_update_employee(PGconn *conn, const char *id, const char *name,
+                        const char *postion, const char *library_id,
+                        const char *phone, char *out, int out_size);
+void db_delete_employee(PGconn *conn, const char *id, char *out, int out_size);
+
+// Account operations
+void db_get_accounts(PGconn *conn, char *out, int out_size);
+void db_get_account(PGconn *conn, const char *id, char *out, int out_size);
+void db_add_account(PGconn *conn, const char *employee_id, const char *login,
+                    const char *password, char *out, int out_size);
+void db_update_account(PGconn *conn, const char *id, const char *employee_id,
+                       const char *login, const char *password, char *out,
+                       int out_size);
+void db_delete_account(PGconn *conn, const char *id, char *out, int out_size);
 #endif                    

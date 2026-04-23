@@ -149,6 +149,56 @@ void handle_command(PGconn *conn, char *cmd_str, char *response, int resp_size) 
     else if (strcmp(cmd, "DELETE_BOOKISSUE") == 0 && n >= 2)
         db_delete_bookissue(conn, parts[1], response, resp_size);
 
+    // Library operations
+    else if (strcmp(cmd, "GET_LIBRARIES") == 0)
+        db_get_libraries(conn, response, resp_size);
+
+    else if (strcmp(cmd, "GET_LIBRARY") == 0 && n >= 2)
+        db_get_library(conn, parts[1], response, resp_size);
+
+    else if (strcmp(cmd, "ADD_LIBRARY") == 0 && n >= 3)
+        db_add_library(conn, parts[1], parts[2], response, resp_size);
+
+    else if (strcmp(cmd, "UPDATE_LIBRARY") == 0 && n >= 4)
+        db_update_library(conn, parts[1], parts[2], parts[3], response, resp_size);
+
+    else if (strcmp(cmd, "DELETE_LIBRARY") == 0 && n >= 2)
+        db_delete_library(conn, parts[1], response, resp_size);
+    
+    // Employee operations
+    else if (strcmp(cmd, "GET_EMPLOYEES") == 0)
+        db_get_employees(conn, response, resp_size);
+
+    else if (strcmp(cmd, "GET_EMPLOYEE") == 0 && n >= 2)
+        db_get_employee(conn, parts[1], response, resp_size);
+
+    else if (strcmp(cmd, "ADD_EMPLOYEE") == 0 && n >= 5)
+        db_add_employee(conn, parts[1], parts[2], parts[3], parts[4], response,
+                        resp_size);
+
+    else if (strcmp(cmd, "UPDATE_EMPLOYEE") == 0 && n >= 6)
+        db_update_employee(conn, parts[1], parts[2], parts[3], parts[4],
+                           parts[5], response, resp_size);
+
+    else if (strcmp(cmd, "DELETE_EMPLOYEE") == 0 && n >= 2)
+        db_delete_employee(conn, parts[1], response, resp_size);
+    
+    // Account operations
+    else if (strcmp(cmd, "GET_ACCOUNTS") == 0)
+        db_get_accounts(conn, response, resp_size);
+
+    else if (strcmp(cmd, "GET_ACCOUNT") == 0 && n >= 2)
+        db_get_account(conn, parts[1], response, resp_size);
+
+    else if (strcmp(cmd, "ADD_ACCOUNT") == 0 && n >= 4)
+        db_add_account(conn, parts[1], parts[2], parts[3], response,
+                        resp_size);
+
+    else if (strcmp(cmd, "UPDATE_ACCOUNT") == 0 && n >= 5)
+        db_update_account(conn, parts[1], parts[2], parts[3], parts[4], response, resp_size);
+
+    else if (strcmp(cmd, "DELETE_ACCOUNT") == 0 && n >= 2)
+        db_delete_account(conn, parts[1], response, resp_size);
     // OTHER
     else
         snprintf(response, resp_size, "ERROR|Unknown command: %s", cmd);

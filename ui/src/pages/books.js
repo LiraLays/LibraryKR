@@ -159,15 +159,15 @@ function renderModalFields(book = null) {
            value="${book ? book.name : ''}"
            placeholder="Book name" />
     
-    <label>Год издания</label>
+    <label>Publication year</label>
     <input type="number" id="book-year"
            value="${book ? book.year : ''}"
-           placeholder="Год" min="1000" max="2100" />
+           placeholder="Year" min="1000" max="2100" />
 
-    <label>Цена</label>
+    <label>Cost</label>
     <input type="number" id="book-cost"
            value="${book ? (book.cost || '') : ''}"
-           placeholder="Цена" min="0" step="0.01" />     
+           placeholder="Cost" min="0" step="0.01" />     
     `;
 }
 

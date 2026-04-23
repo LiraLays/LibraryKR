@@ -62,11 +62,11 @@ function renderTableBody(bookgroups) {
             <td>
                 <button class="btn-edit" onclick="window.editBookgroup('${
                                    bookgroup.id}')">
-                    Изменить
+                    Edit
                 </button>
                 <button class="btn-delete" onclick="window.deleteBookgroupById('${
                                    bookgroup.id}')">
-                    Удалить
+                    Delete
                 </button>
             </td>
         </tr>

@@ -682,7 +682,7 @@ void db_delete_publisher(PGconn *conn, const char *id, char *out,
     PQclear(res);
 }
 
-// ----------------------------------------------- Publishers -----------------------------------------------
+// ----------------------------------------------- BookIssues -----------------------------------------------
 
 // Get bookissues
 void db_get_bookissues(PGconn *conn, char *out, int out_size) {
@@ -806,6 +806,351 @@ void db_delete_bookissue(PGconn *conn, const char *id, char *out, int out_size) 
         snprintf(out, out_size, "ERROR|%s", PQerrorMessage(conn));
     } else {
         snprintf(out, out_size, "OK|Bookissue deleted");
+    }
+    PQclear(res);
+}
+
+// ----------------------------------------------- Library -----------------------------------------------
+
+void db_get_libraries(PGconn *conn, char *out, int out_size) 
+{
+    const char *sql = "SELECT l.idlibrary, l.libraryname, l.address "
+                      "FROM library l "
+                      "ORDER BY l.idlibrary";
+    PGresult *res = PQexec(conn, sql);
+
+    if (PQresultStatus(res) != PGRES_TUPLES_OK) {
+        snprintf(out, out_size, "ERROR|%s", PQerrorMessage(conn));
+        PQclear(res);
+        return;
+    }
+
+    strcpy(out, "OK|");
+    int rows = PQntuples(res);
+    for (int i = 0; i < rows; i++) {
+        char row[512];
+        snprintf(row, sizeof(row), "%s,%s,%s",
+                 PQgetvalue(res, i, 0), // idlibrary
+                 PQgetvalue(res, i, 1), // libraryname
+                 PQgetvalue(res, i, 2)  // address
+        );
+        strncat(out, row, out_size - strlen(out) - 1);
+        if (i < rows - 1)
+            strncat(out, ";", out_size - strlen(out) - 1);
+    }
+    PQclear(res);
+}
+
+void db_get_library(PGconn *conn, const char *id, char *out, int out_size) 
+{
+    const char *params[1] = { id };
+    const char *sql = "SELECT l.idlibrary, l.libraryname, l.address "
+                      "FROM library l "
+                      "WHERE l.idlibrary = $1";
+    PGresult *res = PQexecParams(conn, sql, 1, NULL, params, NULL, NULL, 0);
+
+    if (PQresultStatus(res) != PGRES_TUPLES_OK) {
+        snprintf(out, out_size, "ERROR|%s", PQerrorMessage(conn));
+        PQclear(res);
+        return;
+    }
+
+    strcpy(out, "OK|");
+    int rows = PQntuples(res);
+    for (int i = 0; i < rows; i++) {
+        char row[512];
+        snprintf(row, sizeof(row), "%s,%s,%s",
+                 PQgetvalue(res, i, 0), // idlibrary
+                 PQgetvalue(res, i, 1), // libraryname
+                 PQgetvalue(res, i, 2)  // address
+        );
+        strncat(out, row, out_size - strlen(out) - 1);
+        if (i < rows - 1)
+            strncat(out, ";", out_size - strlen(out) - 1);
+    }
+    PQclear(res);
+}
+
+void db_add_library(PGconn *conn, const char *name, const char *address, char *out, int out_size) 
+{
+    const char *params[2] = {name, address};
+    const char *sql = "INSERT INTO library " 
+                      "(libraryname, address) "
+                      "VALUES ($1, $2)";
+
+    PGresult *res = PQexecParams(conn, sql, 2, NULL, params, NULL, NULL, 0);
+
+    if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+        snprintf(out, out_size, "ERROR|%s", PQerrorMessage(conn));
+    } else {
+        snprintf(out, out_size, "OK|Library added");
+    }
+    PQclear(res);
+}
+
+void db_update_library(PGconn *conn, const char *id, const char *name,
+                       const char *address, char *out, int out_size)
+{
+    const char *params[3] = {name, address, id};
+    const char *sql = "UPDATE library "
+                      "SET libraryname=$1, address=$2 "
+                      "WHERE idlibrary=$3";
+
+    PGresult *res = PQexecParams(conn, sql, 3, NULL, params, NULL, NULL, 0);
+
+    if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+        snprintf(out, out_size, "ERROR|%s", PQerrorMessage(conn));
+    } else {
+        snprintf(out, out_size, "OK|Library updated");
+    }
+    PQclear(res);
+}
+void db_delete_library(PGconn *conn, const char *id, char *out, int out_size) 
+{
+    const char *params[1] = {id};
+    const char *sql = "DELETE FROM library "
+                      "WHERE idlibrary = $1";
+    PGresult *res = PQexecParams(conn, sql, 1, NULL, params, NULL, NULL, 0);
+
+    if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+        snprintf(out, out_size, "ERROR|%s", PQerrorMessage(conn));
+    } else {
+        snprintf(out, out_size, "OK|Library deleted");
+    }
+    PQclear(res);
+}
+
+// ----------------------------------------------- Employee -----------------------------------------------
+
+void db_get_employees(PGconn *conn, char *out, int out_size) 
+{
+    const char *sql = "SELECT emp.idemployee, emp.fullname, emp.position, "
+                      "l.libraryname, emp.phone "
+                      "FROM employee emp "
+                      "JOIN library l ON emp.idlibrary = l.idlibrary "
+                      "ORDER BY emp.idemployee";
+    PGresult *res = PQexec(conn, sql);
+
+    if (PQresultStatus(res) != PGRES_TUPLES_OK) {
+        snprintf(out, out_size, "ERROR|%s", PQerrorMessage(conn));
+        PQclear(res);
+        return;
+    }
+
+    strcpy(out, "OK|");
+    int rows = PQntuples(res);
+    for (int i = 0; i < rows; i++) {
+        char row[512];
+        snprintf(row, sizeof(row), "%s,%s,%s,%s,%s",
+                 PQgetvalue(res, i, 0), // idemployee
+                 PQgetvalue(res, i, 1), // fullname
+                 PQgetvalue(res, i, 2), // position
+                 PQgetvalue(res, i, 3), // libraryname
+                 PQgetvalue(res, i, 4)  // phone
+        );
+        strncat(out, row, out_size - strlen(out) - 1);
+        if (i < rows - 1)
+            strncat(out, ";", out_size - strlen(out) - 1);
+    }
+    PQclear(res);
+}
+
+void db_get_employee(PGconn *conn, const char *id, char *out, int out_size) 
+{
+    const char *params[1] = { id };
+    const char *sql = "SELECT emp.idemployee, emp.fullname, emp.position, "
+                      "l.libraryname, emp.phone "
+                      "FROM employee emp "
+                      "JOIN library l ON emp.idlibrary = l.idlibrary "
+                      "WHERE emp.idemployee=$1";
+    PGresult *res = PQexecParams(conn, sql, 1, NULL, params, NULL, NULL, 0);
+
+    if (PQresultStatus(res) != PGRES_TUPLES_OK) {
+        snprintf(out, out_size, "ERROR|%s", PQerrorMessage(conn));
+        PQclear(res);
+        return;
+    }
+
+    strcpy(out, "OK|");
+    int rows = PQntuples(res);
+    for (int i = 0; i < rows; i++) {
+        char row[512];
+        snprintf(row, sizeof(row), "%s,%s,%s,%s,%s",
+                 PQgetvalue(res, i, 0), // idemployee
+                 PQgetvalue(res, i, 1), // fullname
+                 PQgetvalue(res, i, 2), // position
+                 PQgetvalue(res, i, 3), // libraryname
+                 PQgetvalue(res, i, 4)  // phone
+        );
+        strncat(out, row, out_size - strlen(out) - 1);
+        if (i < rows - 1)
+            strncat(out, ";", out_size - strlen(out) - 1);
+    }
+    PQclear(res);
+}
+
+void db_add_employee(PGconn *conn, const char *name, const char *postion,
+                     const char *library_id, const char *phone, char *out,
+                     int out_size) 
+{
+    const char *params[4] = {name, postion, library_id, phone};
+    const char *sql = "INSERT INTO employee "
+                      "(fullname, position, idlibrary, phone) "
+                      "VALUES ($1, $2, $3, $4)";
+
+    PGresult *res = PQexecParams(conn, sql, 4, NULL, params, NULL, NULL, 0);
+
+    if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+        snprintf(out, out_size, "ERROR|%s", PQerrorMessage(conn));
+    } else {
+        snprintf(out, out_size, "OK|Employee added");
+    }
+    PQclear(res);
+}
+
+void db_update_employee(PGconn *conn, const char *id, const char *name,
+                        const char *postion, const char *library_id,
+                        const char *phone, char *out, int out_size) 
+{
+    const char *params[5] = {name, postion, library_id, phone, id};
+    const char *sql = "UPDATE employee "
+                      "SET fullname=$1, position=$2, idlibrary=$3, phone=$4 "
+                      "WHERE idemployee=$5";
+
+    PGresult *res = PQexecParams(conn, sql, 5, NULL, params, NULL, NULL, 0);
+
+    if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+        snprintf(out, out_size, "ERROR|%s", PQerrorMessage(conn));
+    } else {
+        snprintf(out, out_size, "OK|Employee added");
+    }
+    PQclear(res);
+}
+void db_delete_employee(PGconn *conn, const char *id, char *out, int out_size) 
+{
+    const char *params[1] = {id};
+    const char *sql = "DELETE FROM employee "
+                      "WHERE idemployee = $1";
+    PGresult *res = PQexecParams(conn, sql, 1, NULL, params, NULL, NULL, 0);
+
+    if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+        snprintf(out, out_size, "ERROR|%s", PQerrorMessage(conn));
+    } else {
+        snprintf(out, out_size, "OK|Employee deleted");
+    }
+    PQclear(res);
+}
+// ----------------------------------------------- Account -----------------------------------------------
+
+void db_get_accounts(PGconn *conn, char *out, int out_size) 
+{
+    const char *sql = "SELECT ac.idaccount, emp.fullname, ac.login, "
+                      "ac.password "
+                      "FROM account ac "
+                      "JOIN employee emp ON ac.idemployee = emp.idemployee "
+                      "ORDER BY ac.idaccount";
+    PGresult *res = PQexec(conn, sql);
+
+    if (PQresultStatus(res) != PGRES_TUPLES_OK) {
+        snprintf(out, out_size, "ERROR|%s", PQerrorMessage(conn));
+        PQclear(res);
+        return;
+    }
+
+    strcpy(out, "OK|");
+    int rows = PQntuples(res);
+    for (int i = 0; i < rows; i++) {
+        char row[512];
+        snprintf(row, sizeof(row), "%s,%s,%s,%s",
+                 PQgetvalue(res, i, 0), // idaccount
+                 PQgetvalue(res, i, 1), // fullname
+                 PQgetvalue(res, i, 2), // login
+                 PQgetvalue(res, i, 3)  // password
+        );
+        strncat(out, row, out_size - strlen(out) - 1);
+        if (i < rows - 1)
+            strncat(out, ";", out_size - strlen(out) - 1);
+    }
+    PQclear(res);
+}
+void db_get_account(PGconn *conn, const char *id, char *out, int out_size) 
+{
+    const char *params[1] = { id };
+    const char *sql = "SELECT ac.idaccount, emp.fullname, ac.login, "
+                      "ac.password "
+                      "FROM account ac "
+                      "JOIN employee emp ON ac.idemployee = emp.idemployee "
+                      "WHERE ac.idaccount=$1";
+    PGresult *res = PQexecParams(conn, sql, 1, NULL, params, NULL, NULL, 0);
+
+    if (PQresultStatus(res) != PGRES_TUPLES_OK) {
+        snprintf(out, out_size, "ERROR|%s", PQerrorMessage(conn));
+        PQclear(res);
+        return;
+    }
+
+    strcpy(out, "OK|");
+    int rows = PQntuples(res);
+    for (int i = 0; i < rows; i++) {
+        char row[512];
+        snprintf(row, sizeof(row), "%s,%s,%s,%s",
+                 PQgetvalue(res, i, 0), // idaccount
+                 PQgetvalue(res, i, 1), // fullname
+                 PQgetvalue(res, i, 2), // login
+                 PQgetvalue(res, i, 3)  // password
+        );
+        strncat(out, row, out_size - strlen(out) - 1);
+        if (i < rows - 1)
+            strncat(out, ";", out_size - strlen(out) - 1);
+    }
+    PQclear(res);
+}
+void db_add_account(PGconn *conn, const char *employee_id, const char *login,
+                    const char *password, char *out, int out_size) 
+{
+    const char *params[3] = {employee_id, login, password};
+    const char *sql = "INSERT INTO account "
+                      "(idemployee, login, password) "
+                      "VALUES ($1, $2, $3)";
+
+    PGresult *res = PQexecParams(conn, sql, 3, NULL, params, NULL, NULL, 0);
+
+    if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+        snprintf(out, out_size, "ERROR|%s", PQerrorMessage(conn));
+    } else {
+        snprintf(out, out_size, "OK|Account added");
+    }
+    PQclear(res);
+}
+void db_update_account(PGconn *conn, const char *id, const char *employee_id,
+                       const char *login, const char *password, char *out,
+                       int out_size) 
+{
+    const char *params[4] = {employee_id, login, password, id};
+    const char *sql = "UPDATE account "
+                      "SET idemployee=$1, login=$2, password=$3 "
+                      "WHERE idaccount=$4";
+
+    PGresult *res = PQexecParams(conn, sql, 4, NULL, params, NULL, NULL, 0);
+
+    if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+        snprintf(out, out_size, "ERROR|%s", PQerrorMessage(conn));
+    } else {
+        snprintf(out, out_size, "OK|Account updated");
+    }
+    PQclear(res);
+}
+void db_delete_account(PGconn *conn, const char *id, char *out, int out_size) 
+{
+    const char *params[1] = {id};
+    const char *sql = "DELETE FROM account "
+                      "WHERE idaccount = $1";
+    PGresult *res = PQexecParams(conn, sql, 1, NULL, params, NULL, NULL, 0);
+
+    if (PQresultStatus(res) != PGRES_COMMAND_OK) {
+        snprintf(out, out_size, "ERROR|%s", PQerrorMessage(conn));
+    } else {
+        snprintf(out, out_size, "OK|Account deleted");
     }
     PQclear(res);
 }

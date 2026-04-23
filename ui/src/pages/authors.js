@@ -48,10 +48,10 @@ function renderTableBody(authors) {
             <td>${author.name}</td>
             <td>
                 <button class="btn-edit" onclick="window.editAuthor('${author.id}')">
-                    Изменить
+                    Edit
                 </button>
                 <button class="btn-delete" onclick="window.deleteAuthorById('${author.id}')">
-                    Удалить
+                    Delete
                 </button>
             </td>
         </tr>
@@ -60,7 +60,7 @@ function renderTableBody(authors) {
 
 function renderModalFields(author = null) {
     document.getElementById('modal-fields').innerHTML = `
-    <label>Имя автора</label>
+    <label>Author name</label>
     <input type="text" id="author-name"
            value="${author ? author.name : ''}"
            placeholder="Full author name" />

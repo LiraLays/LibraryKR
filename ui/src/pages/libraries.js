@@ -1,29 +1,29 @@
-import { addPublisher, updatePublisher, deletePublisher, getPublisher, getPublishers } from '../api.js';
+import { addLibrary, updateLibrary, deleteLibrary, getLibrary, getLibraries } from '../api.js';
 
 // Page status
-let allPublishers = []; // All publishers loaded from server
-let editingId = null;    // Id edited publisher (null = add)
+let allLibraries = [];    
+let editingId = null; // Id edited book (null = add)
 
 // Entry point
-export async function initPublishersPage() {
-    document.getElementById('current-table-name').textContent = 'Publishers';
+export async function initLibrariesPage() {
+    document.getElementById('current-table-name').textContent = 'Libraries';
 
     renderTableHead(); // Rendering table head
 
     bindEvents();
 
     // Then load data
-    await loadPublishers();
+    await loadLibraries();
 }
 
-// Loading publishers
-async function loadPublishers() {
-    const response = await getPublishers();
+// Loading data
+async function loadLibraries() {
+    const response = await getLibraries();
     if (response.status === 'ok') {
-        allPublishers = response.data;
-        renderTableBody(allPublishers);
+        allLibraries = response.data;
+        renderTableBody(allLibraries);
     } else {
-        showError('Can\'t load publishers: ' + response.message);
+        showError('Can\'t load libraries: ' + response.message);
     }
 }
 
@@ -33,39 +33,40 @@ async function loadPublishers() {
 function renderTableHead() {
     document.getElementById('table-head').innerHTML = `
         <th>ID</th>
-        <th>Publisher</th>
-        <th>Actions</th>
+        <th>Name</th>
+        <th>Address</th>
     `;
 }
 
 // Filling tbody with book strings
-function renderTableBody(publishers) {
+function renderTableBody(libraries) {
     const tbody = document.getElementById('table-body');
     if (!tbody)
         return;
 
-    if (publishers.length === 0) {
+    if (libraries.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="3" style="text-align:center; color:#999; padding:32px;">
-                    Publishers not found
+                <td colspan="4" style="text-align:center; color:#999; padding:32px;">
+                    Libraries not found
                 </td>
             </tr>`;
         return;
     }
 
-    tbody.innerHTML = publishers
-                          .map(publisher => `
+    tbody.innerHTML = libraries
+                          .map(library => `
         <tr>
-            <td>${publisher.id}</td>
-            <td>${publisher.name}</td>
+            <td>${library.id}</td>
+            <td>${library.name}</td>
+            <td>${library.address}</td>
             <td>
-                <button class="btn-edit" onclick="window.editPublisher('${
-                                   publisher.id}')">
+                <button class="btn-edit" onclick="window.editLibrary('${
+                                   library.id}')">
                     Edit
                 </button>
-                <button class="btn-delete" onclick="window.deletePublisherById('${
-                                   publisher.id}')">
+                <button class="btn-delete" onclick="window.deleteLibraryById('${
+                                   library.id}')">
                     Delete
                 </button>
             </td>
@@ -76,22 +77,26 @@ function renderTableBody(publishers) {
 // Modal window
 
 // Filling #modal-fields
-function renderModalFields(publisher = null) {
-
+function renderModalFields(library = null) {
     document.getElementById('modal-fields').innerHTML = `
-    <label>Publisher</label>
-    <input type="text" id="publisher-name"
-           value="${publisher ? publisher.name : ''}"
-           placeholder="Publisher name" />
+    <label>Name</label>
+    <input type="text" id="library-name"
+           value="${library ? library.name : ''}"
+           placeholder="Library name" />
+    
+    <label>Address</label>
+    <input type="text" id="library-address"
+           value="${library ? library.address : ''}"
+           placeholder="Library address" />
     `;
 }
 
 // Open modal window
-function openModal(publisher = null) {
+function openModal(library = null) {
     document.getElementById('modal-title').textContent =
-        publisher ? 'Edit publisher' : 'Add publisher';
+        library ? 'Edit library' : 'Add library';
 
-    renderModalFields(publisher);
+    renderModalFields(library);
 
     document.getElementById('modal-overlay').classList.remove('hidden');
 }
@@ -124,58 +129,59 @@ function bindEvents() {
 
     document.getElementById('modal-form').onsubmit = async (e) => {
         e.preventDefault();
-        await savePublisher();
+        await saveLibrary();
     };
 }
 
 // CRUD operations
 
-// Save publisher (add or update)
-async function savePublisher() {
-    const name = document.getElementById('publisher-name').value.trim();
+// Save library (add or update)
+async function saveLibrary() {
+    const name = document.getElementById('library-name').value.trim();
+    const address = document.getElementById('library-address').value.trim();
 
     // Simple validation
-    if (!name) {
+    if (!name || !address) {
         alert('Fill all fields!');
         return;
     }
 
     let response;
     if (editingId) // Editing
-        response = await updatePublisher(editingId, name);
+        response = await updateLibrary(editingId, name, address);
     else // Adding new book
-        response = await addPublisher(name);
+        response = await addLibrary(name, address);
 
     if (response.status === 'ok') {
         closeModal();
-        await loadPublishers(); // Reload list
+        await loadLibraries(); // Reload list
     } 
     else 
         alert('Error' + response.message);
 }
 
-// Open edit form for particular publisher
-window.editPublisher = async function(id) {
+// Open edit form for particular library
+window.editLibrary = async function(id) {
     editingId = id;
-    const response = await getPublisher(id);
+    const response = await getLibrary(id);
 
     if (response.status === 'ok' && response.data.length > 0) {
         openModal(response.data[0]);
     } else {
-        alert('Can\'t load publisher data');
+        alert('Can\'t load library data');
     }
 };
 
-// Delete publisher with submit
-window.deletePublisherById = async function(id) {
-    const publisher = allPublishers.find(e => e.id === id);
-    const name = publisher ? publisher.name : `#${id}`;
-    if (!confirm(`Delete publisher "${name}"?`))
+// Delete library with submit
+window.deleteLibraryById = async function(id) {
+    const library = allLibraries.find(l => l.id === id);
+    const name = library ? library.name : `#${id}`;
+    if (!confirm(`Delete library "${name}"?`))
         return;
     
-    const response = await deletePublisher(id);
+    const response = await deleteLibrary(id);
     if (response.status === 'ok')
-        await loadPublishers(); // Reloading list
+        await loadLibraries(); // Reloading list
     else
         alert('Deleting error: ' + response.message);
 };

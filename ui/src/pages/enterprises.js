@@ -62,11 +62,11 @@ function renderTableBody(enterprises) {
             <td>
                 <button class="btn-edit" onclick="window.editEnterprise('${
                                    enterprise.id}')">
-                    Изменить
+                    Edit
                 </button>
                 <button class="btn-delete" onclick="window.deleteEnterpriseById('${
                                    enterprise.id}')">
-                    Удалить
+                    Delete
                 </button>
             </td>
         </tr>

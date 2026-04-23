@@ -76,11 +76,11 @@ function renderTableBody(readers) {
             <td>
                 <button class="btn-edit" onclick="window.editReader('${
                                    reader.id}')">
-                    Изменить
+                    Edit
                 </button>
                 <button class="btn-delete" onclick="window.deleteReaderById('${
                                    reader.id}')">
-                    Удалить
+                    Delete
                 </button>
             </td>
         </tr>

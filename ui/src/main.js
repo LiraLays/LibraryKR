@@ -8,6 +8,9 @@ import { initEnterprisesPage } from "./pages/enterprises.js";
 import { initBookgroupsPage } from "./pages/bookgroups.js";
 import { initPublishersPage } from "./pages/publishers.js";
 import { initBookIssuesPage } from "./pages/bookissues.js";
+import { initAccountsPage } from "./pages/accounts.js";
+import { initEmployeesPage } from './pages/employees.js';
+import { initLibrariesPage } from './pages/libraries.js';
 
 document.getElementById('login-btn').addEventListener('click', async () => {
     const login = document.getElementById('username').value.trim();
@@ -62,6 +65,15 @@ document.getElementById('table-navigation')
                 break;
             case 'publishers':
                 initPublishersPage();
+                break;
+            case 'accounts':
+                initAccountsPage();
+                break;
+            case 'employees':
+                initEmployeesPage();
+                break;
+            case 'libraries':
+                initLibrariesPage();
                 break;
             }
     });

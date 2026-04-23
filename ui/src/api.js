@@ -185,3 +185,83 @@ export async function updateBookIssue(editingId, client_id, book_id, issuedate, 
 export async function deleteBookIssue(id) {
     return await sendCommand(`DELETE_BOOKISSUE|${id}`);
 }
+
+// ----------------------------------------------- Library -----------------------------------------------
+export async function getLibraries() {
+    return await sendCommand("GET_LIBRARIES");
+}
+
+// Get BookIssue
+export async function getLibrary(id) {
+    return await sendCommand(`GET_LIBRARY|${id}`);
+}
+
+// Add BookIssue
+export async function addLibrary(name, adress) {
+    return await sendCommand(
+        `ADD_LIBRARY|${name}|${adress}`);
+}
+
+// Edit BookIssue
+export async function updateLibrary(editingId, name, adress) {
+    return await sendCommand(`UPDATE_LIBRARY|${editingId}|${name}|${adress}`);
+}
+
+// Delete BookIssue
+export async function deleteLibrary(id) {
+    return await sendCommand(`DELETE_LIBRARY|${id}`);
+}
+
+// ----------------------------------------------- Employee -----------------------------------------------
+export async function getEmployees() {
+    return await sendCommand("GET_EMPLOYEES");
+}
+
+// Get BookIssue
+export async function getEmployee(id) {
+    return await sendCommand(`GET_EMPLOYEE|${id}`);
+}
+
+// Add BookIssue
+export async function addEmployee(name, position, library_id, phone) {
+    return await sendCommand(`ADD_EMPLOYEE|${name}|${position}|${library_id}|${
+        phone}`);
+}
+
+// Edit BookIssue
+export async function updateEmployee(editingId, name, position, library_id,
+                                     phone) {
+    return await sendCommand(`UPDATE_EMPLOYEE|${editingId}|${name}|${
+        position}|${library_id}|${phone}`);
+}
+
+// Delete BookIssue
+export async function deleteEmployee(id) {
+    return await sendCommand(`DELETE_EMPLOYEE|${id}`);
+}
+
+// ----------------------------------------------- Account -----------------------------------------------
+export async function getAccounts() {
+    return await sendCommand("GET_ACCOUNTS");
+}
+
+// Get BookIssue
+export async function getAccount(id) {
+    return await sendCommand(`GET_ACCOUNT|${id}`);
+}
+
+// Add BookIssue
+export async function addAccount(employee_id, login, password) {
+    return await sendCommand(`ADD_ACCOUNT|${employee_id}|${login}|${password}`);
+}
+
+// Edit BookIssue
+export async function updateAccount(editingId, employee_id, login, password) {
+    return await sendCommand(
+        `UPDATE_ACCOUNT|${editingId}|${employee_id}|${login}|${password}`);
+}
+
+// Delete BookIssue
+export async function deleteAccount(id) {
+    return await sendCommand(`DELETE_ACCOUNT|${id}`);
+}
