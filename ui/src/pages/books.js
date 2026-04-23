@@ -1,9 +1,11 @@
-import { addBook, editBook, deleteBook, getAuthors, getBook, getBooks } from '../api.js';
+import { addBook, editBook, deleteBook, getAuthors, getBookgroups, getPublishers, getBook, getBooks } from '../api.js';
 
 // Page status
-let allBooks = [];    // All books loaded from server
-let allAuthors = [];  // All authors for drop-down list
-let editingId = null; // Id edited book (null = add)
+let allBooks = [];      // All books loaded from server
+let allAuthors = [];    // All authors for drop-down list
+let allBookgroups = []; // All bookgroups for drop-down list
+let allPublishers = []; // All publishers for drop-down list
+let editingId = null;   // Id edited book (null = add)
 
 // Entry point
 export async function initBooksPage() {
@@ -15,6 +17,8 @@ export async function initBooksPage() {
 
     // Then load data
     await loadAuthors();
+    await loadBookgroups();
+    await loadPublishers();
     await loadBooks();
 }
 
@@ -37,6 +41,22 @@ async function loadAuthors() {
     }
 }
 
+// Loading bookgroups
+async function loadBookgroups() {
+    const response = await getBookgroups();
+    if (response.status === 'ok') {
+        allBookgroups = response.data;
+    }
+}
+
+// Loading publishers
+async function loadPublishers() {
+    const response = await getPublishers();
+    if (response.status === 'ok') {
+        allPublishers = response.data;
+    }
+}
+
 // Render
 
 // Drawing table head
@@ -45,7 +65,9 @@ function renderTableHead() {
         <th>ID</th>
         <th>Name</th>
         <th>Author</th>
+        <th>Group</th>
         <th>Year</th>
+        <th>Publisher</th>
         <th>Cost</th>
         <th>Actions</th>
     `;
@@ -60,19 +82,22 @@ function renderTableBody(books) {
     if (books.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="5" style="text-align:center; color:#999; padding:32px;">
+                <td colspan="6" style="text-align:center; color:#999; padding:32px;">
                     Books not found
                 </td>
             </tr>`;
         return;
     }
 
-    tbody.innerHTML = books.map(book => `
+    tbody.innerHTML = books
+                          .map(book => `
         <tr>
             <td>${book.id}</td>
             <td>${book.name}</td>
             <td>${book.author}</td>
+            <td>${book.group}</td>
             <td>${book.year}</td>
+            <td>${book.publisher}</td>
             <td>${book.cost}</td>
             <td>
                 <button class="btn-edit" onclick="window.editBook('${
@@ -92,12 +117,22 @@ function renderTableBody(books) {
 
 // Filling #modal-fields 
 function renderModalFields(book = null) {
-    // Building drop-down authors list
+    // Building drop-down lists
     const authorOptions = allAuthors.map(a =>
-        `<option value="${a.id}" ${book && book.authorId == a.id ? 'selected' : ''}>
+        `<option value="${a.id}" ${book && book.author == a.name ? 'selected' : ''}>
             ${a.name}
         </option>`
     ).join('');
+
+    const bookgroupsOptions = allBookgroups.map(bgr => 
+        `<option value="${bgr.id}" ${book && book.group == bgr.name ? 'selected' : ''}>
+            ${bgr.name}
+        </option>`).join('');
+
+    const publisherOptions = allPublishers.map(pbl => 
+        `<option value="${pbl.id}" ${ book && book.publisher == pbl.name ? 'selected' : ''}>
+            ${pbl.name}
+        </option>`).join('');
 
     document.getElementById('modal-fields').innerHTML = `
     <label>Название</label>
@@ -109,6 +144,18 @@ function renderModalFields(book = null) {
     <select id="book-author-select">
         <option value="">Выберите автора...</option>
         ${authorOptions}
+    </select>
+
+    <label>Group</label>
+    <select id="book-group-select">
+        <option value="">Select group...</option>
+        ${bookgroupsOptions}
+    </select>
+
+    <label>Publisher</label>
+    <select id="book-publisher-select">
+        <option value="">Select publisher...</option>
+        ${publisherOptions}
     </select>
     
     <label>Год издания</label>

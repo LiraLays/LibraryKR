@@ -114,15 +114,21 @@ json parse_response(const std::string& response) {
                     {"id", fields[0]}, 
                     {"name", fields[1]}
                 });
-        } else if (fields.size() >= 5) {
-            data.push_back(
-                {
-                    {"id", fields[0]},
-                    {"name", fields[1]},
-                    {"author", fields[2]},
-                    {"year", fields[3]},
-                    {"cost", fields[4]}
-                });
+        } else if (fields.size() == 4) {
+            data.push_back({{"id", fields[0]},
+                            {"name", fields[1]},
+                            {"enterprise", fields[2]},
+                            {"workphone", fields[3]}
+            });
+        } else if (fields.size() == 7) {
+            data.push_back({{"id", fields[0]},
+                            {"name", fields[1]},
+                            {"group", fields[2]},
+                            {"author", fields[3]},
+                            {"year", fields[4]},
+                            {"publisher", fields[5]},
+                            {"cost", fields[6]}
+            });
         }
     }
 

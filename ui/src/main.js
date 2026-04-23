@@ -3,6 +3,10 @@ import '../src/styles/books.css'
 
 import { initBooksPage } from "./pages/books.js";
 import { initAuthorsPage } from "./pages/authors.js";
+import { initReadersPage } from "./pages/readers.js";
+import { initEnterprisesPage } from "./pages/enterprises.js";
+import { initBookgroupsPage } from "./pages/bookgroups.js";
+import { initPublishersPage } from "./pages/publishers.js";
 
 document.getElementById('login-btn').addEventListener('click', async () => {
     const login = document.getElementById('username').value.trim();
@@ -43,5 +47,17 @@ document.getElementById('table-navigation')
             case 'authors':
                 initAuthorsPage();
                 break;
-        }
+            case 'readers':
+                initReadersPage();
+                break;
+            case 'enterprises':
+                initEnterprisesPage();
+                break;
+            case 'bookgroups':
+                initBookgroupsPage();
+                break;
+            case 'publishers':
+                initPublishersPage();
+                break;
+            }
     });

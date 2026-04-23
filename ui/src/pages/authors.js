@@ -11,12 +11,7 @@ export async function initAuthorsPage() {
 }
 
 async function loadAuthors() {
-    console.log('loadAuthors: calling getAuthors...');
     const response = await getAuthors();
-    console.log('loadAuthors response status:', response.status);
-    console.log('loadAuthors data length:',
-                response.data ? response.data.length : 'no data');
-
     if (response.status === 'ok') {
         allAuthors = response.data;
         renderTableBody(allAuthors);
@@ -28,8 +23,8 @@ async function loadAuthors() {
 function renderTableHead() {
     document.getElementById('table-head').innerHTML = `
         <th>ID</th>
-        <th>Имя</th>
-        <th>Действия</th>
+        <th>Name</th>
+        <th>Actions</th>
     `;
 }
 
