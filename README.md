@@ -1,5 +1,6 @@
 ###### cd ui && npm run build
-###### cd ../build && cmake --build .
+
+###### cd ../build && cmake --build
 
 # C++ WebView GUI Starter Example
 
@@ -18,9 +19,9 @@ This repository contains the source code for the accompanying YouTube video: **c
 
 * CMake ≥ 3.16
 * C++17 compiler
-    * **Windows:** MSVC 2019+
-    * **macOS:** Apple Clang
-    * **Linux:** GCC ≥ 9 or Clang ≥ 11
+  * **Windows:** MSVC 2019+
+  * **macOS:** Apple Clang
+  * **Linux:** GCC ≥ 9 or Clang ≥ 11
 * Node.JS (Latest LTS recommended)
 
 ### Platform-specific (when building)
@@ -29,7 +30,7 @@ This repository contains the source code for the accompanying YouTube video: **c
 |-|-|
 | Windows | WebView2 Runtime (included in Windows 11) |
 | macOS | WebKit via Cocoa (included in macOS) |
-| Linux (GTK) |	GTK 3 or 4 and WebKitGTK development libraries (4 or 6) |
+| Linux (GTK) | GTK 3 or 4 and WebKitGTK development libraries (4 or 6) |
 
 ## Build Instructions
 
@@ -40,21 +41,24 @@ git clone https://github.com/nikelaz/cpp-webview-gui.git
 cd cpp-webview-gui
 ```
 
-2. Build the UI
+1. Build the UI
+
 ```
 cd ui
 npm install
 npm run build
 ```
 
-2. Create a build directory in the project root and configure:
+1. Create a build directory in the project root and configure:
+
 ```
 mkdir build
 cd build
 cmake ..
 ```
 
-3. Build the project:
+1. Build the project:
+
 ```
 cmake --build .
 ```
@@ -66,3 +70,5 @@ The executable will be located in: `build/bin`
 * The frontend files are embedded as a header (ui/dist/index_html.h) — no external files are required.
 * JavaScript communicates with C++ via WebView bindings, using JSON for argument passing.
 * The project uses CMake FetchContent to automatically fetch webview and nlohmann/json.
+
+Test 1
